@@ -12,7 +12,7 @@
   2. Replace YOUR_GOOGLE_MAPS_API_KEY below with your real key
   Free tier covers typical small-business volume; see cloud.google.com/maps-platform/pricing
 -->
-<script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDw3mJR9jdREC_FyR6NEFE241JCLRFwXIk&libraries=places&callback=ngzInitGooglePlaces" async defer></script>
+<script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDw3mJR9jdREC_FyR6NEFE241JCLRFwXIk&libraries=places&callback=ngzInitGooglePlaces" defer></script>
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Poppins:wght@600;700;800&display=swap');
 
@@ -598,7 +598,12 @@
 
   function ngzInitGooglePlaces() {
     var input = document.getElementById('googleBusinessSearch');
-    if (!input || typeof google === 'undefined') return;
+    if (!input) {
+      // Input not in the DOM yet — retry shortly instead of silently giving up.
+      setTimeout(ngzInitGooglePlaces, 100);
+      return;
+    }
+    if (typeof google === 'undefined' || !google.maps || !google.maps.places) return;
 
     ngzPlacesAutocomplete = new google.maps.places.Autocomplete(input, {
       types: ['establishment'],
