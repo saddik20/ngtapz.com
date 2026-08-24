@@ -1,0 +1,1782 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Analytics Dashboard | NGTAPZ</title>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Poppins:wght@400;500;600;700;800&display=swap');
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+/* ==================== LOGIN SECTION ==================== */
+.login-wrapper {
+  min-height: 100vh;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 50%, #f093fb 100%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 40px;
+  overflow: hidden;
+}
+
+.login-bg-shapes {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 0;
+}
+
+.login-bg-shape {
+  position: absolute;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.1);
+  animation: float 20s infinite ease-in-out;
+}
+
+.login-bg-shape:nth-child(1) { width: 400px; height: 400px; top: -100px; left: -100px; }
+.login-bg-shape:nth-child(2) { width: 300px; height: 300px; bottom: 10%; right: 10%; animation-delay: -5s; }
+.login-bg-shape:nth-child(3) { width: 200px; height: 200px; top: 40%; right: 25%; animation-delay: -10s; }
+
+@keyframes float {
+  0%, 100% { transform: translateY(0) rotate(0deg); }
+  50% { transform: translateY(-30px) rotate(5deg); }
+}
+
+.login-card {
+  background: rgba(255, 255, 255, 0.98);
+  backdrop-filter: blur(20px);
+  border-radius: 24px;
+  padding: 60px;
+  width: 100%;
+  max-width: 500px;
+  box-shadow: 0 25px 80px rgba(0, 0, 0, 0.2);
+  position: relative;
+  z-index: 1;
+  animation: fadeInUp 0.6s ease-out;
+}
+
+.login-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 5px;
+  background: linear-gradient(90deg, #667eea, #764ba2, #f093fb);
+  border-radius: 24px 24px 0 0;
+}
+
+.login-logo {
+  text-align: center;
+  margin-bottom: 40px;
+}
+
+.login-logo-icon {
+  width: 80px;
+  height: 80px;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  border-radius: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto 20px;
+  font-size: 2.5rem;
+  box-shadow: 0 10px 30px rgba(102, 126, 234, 0.3);
+}
+
+.login-logo h1 {
+  font-family: 'Poppins', sans-serif;
+  font-size: 2rem;
+  font-weight: 700;
+  color: #1a1a1a;
+}
+
+.login-logo p {
+  color: #666;
+  font-size: 1.1rem;
+  margin-top: 8px;
+}
+
+.login-form-group {
+  margin-bottom: 24px;
+}
+
+.login-form-label {
+  display: block;
+  font-weight: 600;
+  font-size: 0.95rem;
+  color: #333;
+  margin-bottom: 10px;
+}
+
+.login-form-input {
+  width: 100%;
+  padding: 16px 20px;
+  border: 2px solid #e8eaf0;
+  border-radius: 12px;
+  font-size: 1.1rem;
+  transition: all 0.3s ease;
+  font-family: inherit;
+}
+
+.login-form-input:focus {
+  outline: none;
+  border-color: #667eea;
+  box-shadow: 0 0 0 4px rgba(102, 126, 234, 0.1);
+}
+
+.login-btn {
+  width: 100%;
+  padding: 18px;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: #fff;
+  border: none;
+  border-radius: 12px;
+  font-size: 1.1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  font-family: inherit;
+}
+
+.login-btn:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 15px 40px rgba(102, 126, 234, 0.4);
+}
+
+.login-error {
+  background: linear-gradient(135deg, #fee2e2 0%, #fecaca 100%);
+  border: 1px solid #f87171;
+  border-radius: 12px;
+  padding: 16px 20px;
+  color: #dc2626;
+  font-size: 1rem;
+  margin-bottom: 24px;
+  display: none;
+}
+
+.login-error.show { display: block; }
+
+.login-footer {
+  text-align: center;
+  margin-top: 30px;
+  color: #666;
+  font-size: 1rem;
+}
+
+.login-footer a {
+  color: #667eea;
+  font-weight: 600;
+  text-decoration: none;
+}
+
+/* ==================== DASHBOARD LAYOUT ==================== */
+.dashboard-wrapper {
+  min-height: 100vh;
+  background: #f8fafc;
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+}
+
+.dashboard-container {
+  max-width: 1600px;
+  margin: 0 auto;
+  padding: 40px 60px;
+}
+
+/* Header */
+.dashboard-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 40px;
+  padding-bottom: 30px;
+  border-bottom: 1px solid #e2e8f0;
+}
+
+.header-left {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+}
+
+.header-logo {
+  width: 60px;
+  height: 60px;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  border-radius: 16px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.75rem;
+  box-shadow: 0 8px 25px rgba(102, 126, 234, 0.25);
+}
+
+.header-title h1 {
+  font-family: 'Poppins', sans-serif;
+  font-size: 2rem;
+  font-weight: 700;
+  color: #1a1a1a;
+}
+
+.header-title p {
+  color: #64748b;
+  font-size: 1rem;
+  margin-top: 4px;
+}
+
+.header-right {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+}
+
+.user-badge {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  background: #fff;
+  padding: 12px 24px;
+  border-radius: 50px;
+  box-shadow: 0 2px 15px rgba(0,0,0,0.06);
+  border: 1px solid #e2e8f0;
+}
+
+.user-avatar {
+  width: 44px;
+  height: 44px;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #fff;
+  font-weight: 600;
+  font-size: 1.1rem;
+}
+
+.user-email {
+  color: #333;
+  font-weight: 500;
+  font-size: 1rem;
+}
+
+.logout-btn {
+  padding: 12px 24px;
+  background: #fff;
+  border: 2px solid #e2e8f0;
+  border-radius: 12px;
+  color: #64748b;
+  font-weight: 600;
+  font-size: 0.95rem;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  font-family: inherit;
+}
+
+.logout-btn:hover {
+  border-color: #667eea;
+  color: #667eea;
+}
+
+/* ==================== STATS GRID ==================== */
+.stats-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 24px;
+  margin-bottom: 40px;
+}
+
+.stat-card {
+  background: #fff;
+  border-radius: 20px;
+  padding: 28px 32px;
+  box-shadow: 0 4px 20px rgba(0,0,0,0.04);
+  border: 1px solid #e2e8f0;
+  transition: all 0.3s ease;
+  position: relative;
+  overflow: hidden;
+}
+
+.stat-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 12px 40px rgba(0,0,0,0.08);
+}
+
+.stat-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 5px;
+  height: 100%;
+}
+
+.stat-card:nth-child(1)::before { background: linear-gradient(180deg, #667eea, #764ba2); }
+.stat-card:nth-child(2)::before { background: linear-gradient(180deg, #f093fb, #f5576c); }
+.stat-card:nth-child(3)::before { background: linear-gradient(180deg, #4facfe, #00f2fe); }
+.stat-card:nth-child(4)::before { background: linear-gradient(180deg, #43e97b, #38f9d7); }
+
+.stat-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 16px;
+}
+
+.stat-icon {
+  width: 56px;
+  height: 56px;
+  border-radius: 14px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.5rem;
+}
+
+.stat-card:nth-child(1) .stat-icon { background: linear-gradient(135deg, #667eea15, #764ba215); }
+.stat-card:nth-child(2) .stat-icon { background: linear-gradient(135deg, #f093fb15, #f5576c15); }
+.stat-card:nth-child(3) .stat-icon { background: linear-gradient(135deg, #4facfe15, #00f2fe15); }
+.stat-card:nth-child(4) .stat-icon { background: linear-gradient(135deg, #43e97b15, #38f9d715); }
+
+.stat-trend {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: #22c55e;
+  padding: 6px 12px;
+  background: #dcfce7;
+  border-radius: 20px;
+}
+
+.stat-label {
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: #64748b;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin-bottom: 8px;
+}
+
+.stat-value {
+  font-family: 'Poppins', sans-serif;
+  font-size: 2.5rem;
+  font-weight: 700;
+  color: #1a1a1a;
+}
+
+/* ==================== MAIN GRID LAYOUT ==================== */
+.main-grid {
+  display: grid;
+  grid-template-columns: 1fr 400px;
+  gap: 30px;
+  margin-bottom: 40px;
+}
+
+/* ==================== CHARTS ==================== */
+.charts-column {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+.chart-card {
+  background: #fff;
+  border-radius: 20px;
+  padding: 28px 32px;
+  box-shadow: 0 4px 20px rgba(0,0,0,0.04);
+  border: 1px solid #e2e8f0;
+}
+
+.chart-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 24px;
+}
+
+.chart-title {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  font-weight: 600;
+  color: #1a1a1a;
+  font-size: 1.15rem;
+}
+
+.chart-title-icon {
+  font-size: 1.25rem;
+}
+
+.chart-period {
+  display: flex;
+  gap: 8px;
+}
+
+.period-btn {
+  padding: 8px 16px;
+  border: 1px solid #e2e8f0;
+  background: #fff;
+  border-radius: 8px;
+  font-size: 0.85rem;
+  color: #64748b;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  font-family: inherit;
+  font-weight: 500;
+}
+
+.period-btn.active {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: #fff;
+  border-color: transparent;
+}
+
+.custom-range-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-top: 14px;
+  padding-top: 14px;
+  border-top: 1px solid #e2e8f0;
+}
+
+.custom-range-row.hidden { display: none; }
+
+.custom-date-input {
+  padding: 8px 12px;
+  border: 1px solid #e2e8f0;
+  border-radius: 8px;
+  font-size: 0.85rem;
+  font-family: inherit;
+  color: #334155;
+}
+
+.custom-range-sep {
+  font-size: 0.85rem;
+  color: #94a3b8;
+}
+
+.custom-range-apply {
+  padding: 8px 18px;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: #fff;
+  border: none;
+  border-radius: 8px;
+  font-size: 0.85rem;
+  font-weight: 600;
+  cursor: pointer;
+  font-family: inherit;
+}
+
+.chart-container {
+  height: 300px;
+  position: relative;
+}
+
+.charts-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 24px;
+}
+
+/* ==================== CARDS SECTION (GROUPED) ==================== */
+.cards-sidebar {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.cards-section-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.cards-section-title {
+  font-family: 'Poppins', sans-serif;
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: #1a1a1a;
+}
+
+.add-card-btn {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 20px;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: #fff;
+  border: none;
+  border-radius: 10px;
+  font-size: 0.9rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  text-decoration: none;
+  font-family: inherit;
+}
+
+.add-card-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 25px rgba(102, 126, 234, 0.35);
+}
+
+/* Card Group (Stacked) */
+.card-group {
+  background: #fff;
+  border-radius: 16px;
+  box-shadow: 0 4px 20px rgba(0,0,0,0.04);
+  border: 1px solid #e2e8f0;
+  overflow: hidden;
+  transition: all 0.3s ease;
+}
+
+.card-group:hover {
+  box-shadow: 0 8px 30px rgba(0,0,0,0.08);
+}
+
+.card-group-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 20px 24px;
+  cursor: pointer;
+  transition: background 0.2s ease;
+}
+
+.card-group-header:hover {
+  background: #f8fafc;
+}
+
+.card-group-left {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.card-group-icon {
+  width: 52px;
+  height: 52px;
+  border-radius: 14px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.5rem;
+}
+
+.group-social .card-group-icon { background: linear-gradient(135deg, #dbeafe, #bfdbfe); }
+.group-menu .card-group-icon { background: linear-gradient(135deg, #fef3c7, #fde68a); }
+.group-review .card-group-icon { background: linear-gradient(135deg, #dcfce7, #bbf7d0); }
+
+.card-group-info h3 {
+  font-weight: 600;
+  color: #1a1a1a;
+  font-size: 1.05rem;
+  margin-bottom: 4px;
+}
+
+.card-group-meta {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  font-size: 0.85rem;
+  color: #64748b;
+}
+
+.card-group-meta span {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.card-group-right {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.card-count-badge {
+  padding: 8px 16px;
+  border-radius: 20px;
+  font-size: 0.85rem;
+  font-weight: 700;
+}
+
+.group-social .card-count-badge { background: #dbeafe; color: #1d4ed8; }
+.group-menu .card-count-badge { background: #fef3c7; color: #d97706; }
+.group-review .card-count-badge { background: #dcfce7; color: #16a34a; }
+
+.expand-icon {
+  width: 32px;
+  height: 32px;
+  border-radius: 8px;
+  background: #f1f5f9;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.3s ease;
+  font-size: 0.8rem;
+  color: #64748b;
+}
+
+.card-group.expanded .expand-icon {
+  transform: rotate(180deg);
+  background: #667eea;
+  color: #fff;
+}
+
+/* Expanded Card List */
+.card-group-content {
+  max-height: 0;
+  overflow: hidden;
+  transition: max-height 0.4s ease;
+  background: #f8fafc;
+}
+
+.card-group.expanded .card-group-content {
+  max-height: 1000px;
+  border-top: 1px solid #e2e8f0;
+}
+
+.card-list {
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  max-height: 400px;
+  overflow-y: auto;
+}
+
+.card-list-item {
+  background: #fff;
+  border-radius: 12px;
+  padding: 16px 20px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  border: 1px solid #e2e8f0;
+  transition: all 0.2s ease;
+}
+
+.card-list-item:hover {
+  border-color: #667eea;
+  box-shadow: 0 4px 15px rgba(102, 126, 234, 0.1);
+}
+
+.card-list-info {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+
+.card-list-platform {
+  width: 40px;
+  height: 40px;
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.1rem;
+  background: #f1f5f9;
+}
+
+.card-list-details h4 {
+  font-weight: 600;
+  color: #1a1a1a;
+  font-size: 0.95rem;
+  margin-bottom: 2px;
+}
+
+.card-list-code {
+  font-family: 'SF Mono', Monaco, monospace;
+  font-size: 0.95rem;
+  color: #fff;
+  background: #5b45d6;
+  padding: 4px 10px;
+  border-radius: 6px;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+}
+
+.card-list-stats {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+}
+
+.card-list-stat {
+  text-align: center;
+}
+
+.card-list-stat-value {
+  font-weight: 700;
+  font-size: 1.1rem;
+  color: #1a1a1a;
+}
+
+.card-list-stat-label {
+  font-size: 0.7rem;
+  color: #64748b;
+  text-transform: uppercase;
+}
+
+.card-list-actions {
+  display: flex;
+  gap: 8px;
+}
+
+.card-mini-btn {
+  padding: 8px 14px;
+  border-radius: 8px;
+  font-size: 0.8rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  border: none;
+  font-family: inherit;
+}
+
+.card-mini-btn.primary {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: #fff;
+}
+
+.card-mini-btn.secondary {
+  background: #f1f5f9;
+  color: #64748b;
+}
+
+.card-mini-btn:hover {
+  transform: translateY(-1px);
+}
+
+/* ==================== ACTIVITY SECTION ==================== */
+.activity-section {
+  background: #fff;
+  border-radius: 20px;
+  padding: 28px 32px;
+  box-shadow: 0 4px 20px rgba(0,0,0,0.04);
+  border: 1px solid #e2e8f0;
+}
+
+.activity-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 24px;
+}
+
+.activity-title {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  font-weight: 600;
+  color: #1a1a1a;
+  font-size: 1.15rem;
+}
+
+.activity-list {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+  gap: 16px;
+  max-height: 400px;
+  overflow-y: auto;
+}
+
+.activity-item {
+  display: flex;
+  align-items: center;
+  padding: 16px 20px;
+  background: #f8fafc;
+  border-radius: 12px;
+  transition: all 0.2s ease;
+  border: 1px solid transparent;
+}
+
+.activity-item:hover {
+  background: #fff;
+  border-color: #e2e8f0;
+  box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+}
+
+.activity-icon {
+  width: 48px;
+  height: 48px;
+  background: linear-gradient(135deg, #667eea15 0%, #764ba215 100%);
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-right: 16px;
+  font-size: 1.25rem;
+}
+
+.activity-details {
+  flex: 1;
+}
+
+.activity-text {
+  font-size: 0.95rem;
+  color: #333;
+  font-weight: 500;
+}
+
+.activity-text strong {
+  color: #667eea;
+}
+
+.activity-meta {
+  font-size: 0.85rem;
+  color: #64748b;
+  margin-top: 4px;
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+
+.activity-time {
+  font-size: 0.85rem;
+  color: #64748b;
+  font-weight: 500;
+  white-space: nowrap;
+}
+
+/* ==================== LOADING & EMPTY STATES ==================== */
+.loading-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 100px;
+}
+
+.loading-spinner {
+  width: 56px;
+  height: 56px;
+  border: 4px solid #e2e8f0;
+  border-top-color: #667eea;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+  margin-bottom: 20px;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+.loading-text {
+  color: #64748b;
+  font-size: 1.1rem;
+}
+
+.empty-state {
+  text-align: center;
+  padding: 60px 40px;
+  background: linear-gradient(135deg, #f8fafc 0%, #eef2ff 100%);
+  border-radius: 16px;
+  border: 2px dashed #e2e8f0;
+}
+
+.empty-state-icon {
+  font-size: 3.5rem;
+  margin-bottom: 20px;
+}
+
+.empty-state h3 {
+  font-family: 'Poppins', sans-serif;
+  font-size: 1.35rem;
+  color: #333;
+  margin-bottom: 10px;
+}
+
+.empty-state p {
+  color: #64748b;
+  margin-bottom: 24px;
+  font-size: 1rem;
+}
+
+/* ==================== ANIMATIONS ==================== */
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* ==================== RESPONSIVE ==================== */
+@media (max-width: 1400px) {
+  .main-grid {
+    grid-template-columns: 1fr 360px;
+  }
+}
+
+@media (max-width: 1200px) {
+  .main-grid {
+    grid-template-columns: 1fr;
+  }
+  
+  .cards-sidebar {
+    order: -1;
+  }
+  
+  .stats-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+  
+  .charts-row {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 768px) {
+  .dashboard-container {
+    padding: 20px;
+  }
+  
+  .stats-grid {
+    grid-template-columns: 1fr;
+  }
+  
+  .dashboard-header {
+    flex-direction: column;
+    gap: 20px;
+  }
+}
+
+.hidden {
+  display: none !important;
+}
+
+/* ==================== INLINE EDIT MODAL ==================== */
+.ngz-modal-overlay {
+  display: none;
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.5);
+  z-index: 9999;
+  align-items: center;
+  justify-content: center;
+}
+.ngz-modal-overlay.show { display: flex; }
+.ngz-modal-box {
+  background: #fff;
+  border-radius: 20px;
+  padding: 32px;
+  max-width: 440px;
+  width: 90%;
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+  box-shadow: 0 25px 80px rgba(0,0,0,0.3);
+}
+.ngz-modal-box h3 {
+  font-family: 'Poppins', sans-serif;
+  font-size: 1.35rem;
+  color: #1a1a1a;
+  margin-bottom: 4px;
+}
+.ngz-modal-cardid {
+  font-family: 'SF Mono', Monaco, monospace;
+  font-size: 0.8rem;
+  color: #667eea;
+  background: #667eea10;
+  display: inline-block;
+  padding: 3px 10px;
+  border-radius: 6px;
+  margin-bottom: 20px;
+  font-weight: 600;
+}
+.ngz-modal-label {
+  display: block;
+  font-weight: 600;
+  font-size: 0.9rem;
+  color: #334155;
+  margin-bottom: 8px;
+}
+.ngz-modal-input {
+  width: 100%;
+  padding: 14px 16px;
+  border: 2px solid #e2e8f0;
+  border-radius: 10px;
+  font-size: 1rem;
+  font-family: inherit;
+  margin-bottom: 8px;
+}
+.ngz-modal-input:focus {
+  outline: none;
+  border-color: #667eea;
+  box-shadow: 0 0 0 4px rgba(102, 126, 234, 0.15);
+}
+.ngz-modal-error {
+  color: #dc2626;
+  font-size: 0.85rem;
+  min-height: 18px;
+  margin-bottom: 12px;
+}
+.ngz-modal-actions {
+  display: flex;
+  gap: 12px;
+  margin-top: 8px;
+}
+.ngz-modal-save {
+  flex: 1;
+  padding: 14px;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: #fff;
+  border: none;
+  border-radius: 10px;
+  font-weight: 700;
+  font-size: 0.95rem;
+  cursor: pointer;
+  font-family: inherit;
+}
+.ngz-modal-save:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+.ngz-modal-cancel {
+  padding: 14px 20px;
+  background: #f1f5f9;
+  color: #64748b;
+  border: none;
+  border-radius: 10px;
+  font-weight: 600;
+  font-size: 0.95rem;
+  cursor: pointer;
+  font-family: inherit;
+}
+</style>
+</head>
+<body>
+
+
+<!-- LOGIN SECTION -->
+<div id="loginSection" class="login-wrapper">
+  <div class="login-bg-shapes">
+    <div class="login-bg-shape"></div>
+    <div class="login-bg-shape"></div>
+    <div class="login-bg-shape"></div>
+  </div>
+  
+  <div class="login-card">
+    <div class="login-logo">
+      <div class="login-logo-icon">📊</div>
+      <h1>Analytics Dashboard</h1>
+      <p>Login to view your NFC card analytics</p>
+    </div>
+    
+    <div id="loginError" class="login-error"></div>
+    
+    <div class="login-form-group">
+      <label class="login-form-label">Email Address</label>
+      <input type="email" id="loginEmail" class="login-form-input" placeholder="your@email.com">
+    </div>
+    
+    <div class="login-form-group">
+      <label class="login-form-label">Password</label>
+      <input type="password" id="loginPassword" class="login-form-input" placeholder="Your password">
+    </div>
+    
+    <button type="button" id="loginBtn" class="login-btn">Login to Dashboard</button>
+    
+    <p class="login-footer">
+      Don't have an account? <a href="/pages/activation">Activate a card first</a>
+    </p>
+  </div>
+</div>
+
+<!-- DASHBOARD SECTION -->
+<div id="dashboardSection" class="dashboard-wrapper hidden">
+  <div class="dashboard-container">
+    
+    <!-- Header -->
+    <div class="dashboard-header">
+      <div class="header-left">
+        <div class="header-logo">📊</div>
+        <div class="header-title">
+          <h1>Analytics Dashboard</h1>
+          <p>Track your NFC card performance in real-time</p>
+        </div>
+      </div>
+      <div class="header-right">
+        <div class="user-badge">
+          <div class="user-avatar" id="userAvatar">U</div>
+          <span class="user-email" id="userEmail">user@email.com</span>
+        </div>
+        <button class="logout-btn" id="logoutBtn">Logout</button>
+      </div>
+    </div>
+
+    <!-- Loading State -->
+    <div id="loadingState" class="loading-container">
+      <div class="loading-spinner"></div>
+      <p class="loading-text">Loading your analytics...</p>
+    </div>
+
+    <!-- Dashboard Content -->
+    <div id="dashboardContent" class="hidden">
+      
+      <!-- Stats -->
+      <div class="stats-grid">
+        <div class="stat-card">
+          <div class="stat-header">
+            <div class="stat-icon">💳</div>
+            <div class="stat-trend">Active</div>
+          </div>
+          <div class="stat-label">Total Cards</div>
+          <div class="stat-value" id="statTotalCards">0</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-header">
+            <div class="stat-icon">📱</div>
+            <div class="stat-trend">All time</div>
+          </div>
+          <div class="stat-label">Total Scans</div>
+          <div class="stat-value" id="statTotalScans">0</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-header">
+            <div class="stat-icon">📈</div>
+            <div class="stat-trend">Average</div>
+          </div>
+          <div class="stat-label">Scans per Card</div>
+          <div class="stat-value" id="statAvgScans">0</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-header">
+            <div class="stat-icon">🌍</div>
+            <div class="stat-trend">Top</div>
+          </div>
+          <div class="stat-label">Top Country</div>
+          <div class="stat-value" id="statTopCountry" style="font-size: 1.75rem;">-</div>
+        </div>
+      </div>
+
+      <!-- Main Grid: Charts + Cards Sidebar -->
+      <div class="main-grid">
+        
+        <!-- Charts Column -->
+        <div class="charts-column">
+          <div class="chart-card">
+            <div class="chart-header">
+              <div class="chart-title">
+                <span class="chart-title-icon">📈</span>
+                Scans Over Time
+              </div>
+              <div class="chart-period">
+                <button class="period-btn" data-days="1">1 Day</button>
+                <button class="period-btn" data-days="7">7 Days</button>
+                <button class="period-btn active" data-days="30">30 Days</button>
+                <button class="period-btn" data-days="custom">Custom</button>
+              </div>
+              <div id="customRangeRow" class="custom-range-row hidden">
+                <input type="date" id="customStartDate" class="custom-date-input">
+                <span class="custom-range-sep">to</span>
+                <input type="date" id="customEndDate" class="custom-date-input">
+                <button id="applyCustomRange" class="custom-range-apply">Apply</button>
+              </div>
+            </div>
+            <div class="chart-container">
+              <canvas id="scansChart"></canvas>
+            </div>
+          </div>
+
+          <div class="charts-row">
+            <div class="chart-card">
+              <div class="chart-header">
+                <div class="chart-title">
+                  <span class="chart-title-icon">📱</span>
+                  Devices
+                </div>
+              </div>
+              <div class="chart-container">
+                <canvas id="devicesChart"></canvas>
+              </div>
+            </div>
+            <div class="chart-card">
+              <div class="chart-header">
+                <div class="chart-title">
+                  <span class="chart-title-icon">🌍</span>
+                  Locations
+                </div>
+              </div>
+              <div class="chart-container">
+                <canvas id="locationsChart"></canvas>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Cards Sidebar (Grouped) -->
+        <div class="cards-sidebar">
+          <div class="cards-section-header">
+            <h2 class="cards-section-title">Your Cards</h2>
+            <a href="/pages/activation" class="add-card-btn">+ Add Card</a>
+          </div>
+          
+          <div id="cardGroups">
+            <!-- Card groups will be populated here -->
+          </div>
+          
+          <div id="emptyState" class="empty-state hidden">
+            <div class="empty-state-icon">💳</div>
+            <h3>No Cards Yet</h3>
+            <p>Activate your first NFC card to start tracking</p>
+            <a href="/pages/activation" class="add-card-btn">Activate a Card</a>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- Activity -->
+      <div class="activity-section">
+        <div class="activity-header">
+          <div class="activity-title">
+            <span>🔔</span>
+            Recent Activity
+          </div>
+        </div>
+        <div id="activityList" class="activity-list"></div>
+      </div>
+
+    </div>
+
+  </div>
+</div>
+
+<!-- INLINE EDIT MODAL -->
+<div class="ngz-modal-overlay" id="ngzEditOverlay">
+  <div class="ngz-modal-box">
+    <h3>Edit Card</h3>
+    <span class="ngz-modal-cardid" id="ngzEditCardId">-</span>
+    <label class="ngz-modal-label">Destination URL</label>
+    <input type="url" id="ngzEditUrlInput" class="ngz-modal-input" placeholder="https://...">
+    <p class="ngz-modal-error" id="ngzEditError"></p>
+    <div class="ngz-modal-actions">
+      <button class="ngz-modal-save" id="ngzEditSaveBtn">Save Changes</button>
+      <button class="ngz-modal-cancel" id="ngzEditCancelBtn">Cancel</button>
+    </div>
+  </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+  
+  const API_URL = 'https://nfc-redirect.ngoodiezllc.workers.dev';
+  
+  let scansChart = null;
+  let devicesChart = null;
+  let locationsChart = null;
+  
+  // Check if logged in
+  const savedToken = localStorage.getItem('nfc_token');
+  if (savedToken) {
+    showDashboard();
+    loadDashboardData(savedToken);
+  }
+  
+  // Login handler
+  document.getElementById('loginBtn').addEventListener('click', function() {
+    var email = document.getElementById('loginEmail').value.trim().toLowerCase();
+    var password = document.getElementById('loginPassword').value;
+    var errorDiv = document.getElementById('loginError');
+    
+    if (!email || !password) {
+      errorDiv.textContent = 'Please enter email and password';
+      errorDiv.className = 'login-error show';
+      return;
+    }
+    
+    var btn = document.getElementById('loginBtn');
+    btn.disabled = true;
+    btn.textContent = 'Logging in...';
+    
+    fetch(API_URL + '/api/login', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ email: email, password: password })
+    })
+    .then(function(r) { return r.json(); })
+    .then(function(data) {
+      if (data.success) {
+        localStorage.setItem('nfc_token', data.token);
+        localStorage.setItem('nfc_user_email', email);
+        showDashboard();
+        loadDashboardData(data.token);
+      } else {
+        throw new Error(data.error || 'Login failed');
+      }
+    })
+    .catch(function(err) {
+      errorDiv.textContent = err.message;
+      errorDiv.className = 'login-error show';
+      btn.disabled = false;
+      btn.textContent = 'Login to Dashboard';
+    });
+  });
+  
+  // Logout
+  document.getElementById('logoutBtn').addEventListener('click', function() {
+    localStorage.removeItem('nfc_token');
+    localStorage.removeItem('nfc_user_email');
+    location.reload();
+  });
+  
+  function showDashboard() {
+    document.getElementById('loginSection').classList.add('hidden');
+    document.getElementById('dashboardSection').classList.remove('hidden');
+    var email = localStorage.getItem('nfc_user_email') || '';
+    document.getElementById('userEmail').textContent = email;
+    document.getElementById('userAvatar').textContent = email.charAt(0).toUpperCase();
+  }
+  
+  function loadDashboardData(token) {
+    fetch(API_URL + '/api/dashboard', {
+      method: 'GET',
+      headers: {
+        'Authorization': 'Bearer ' + token,
+        'Content-Type': 'application/json'
+      }
+    })
+    .then(function(r) { return r.json(); })
+    .then(function(data) {
+      if (data.success) {
+        renderDashboard(data);
+      } else {
+        throw new Error(data.error);
+      }
+    })
+    .catch(function(err) {
+      console.error('Dashboard error:', err);
+      if (err.message === 'Unauthorized') {
+        localStorage.removeItem('nfc_token');
+        location.reload();
+      }
+    });
+  }
+  
+  var ngzByDateData = {}; // stashed so period buttons can re-render without refetching
+
+  function renderDashboard(data) {
+    document.getElementById('loadingState').classList.add('hidden');
+    document.getElementById('dashboardContent').classList.remove('hidden');
+    
+    // Stats
+    document.getElementById('statTotalCards').textContent = data.summary.totalCards;
+    document.getElementById('statTotalScans').textContent = data.summary.totalScans.toLocaleString();
+    document.getElementById('statAvgScans').textContent = data.summary.avgScansPerCard;
+    
+    var topCountry = '-';
+    var maxCount = 0;
+    for (var country in data.aggregatedStats.byCountry) {
+      if (data.aggregatedStats.byCountry[country] > maxCount) {
+        maxCount = data.aggregatedStats.byCountry[country];
+        topCountry = country;
+      }
+    }
+    document.getElementById('statTopCountry').textContent = topCountry;
+    
+    // Charts
+    ngzByDateData = data.aggregatedStats.byDate || {};
+    renderScansChart(ngzByDateData, 30);
+    renderDevicesChart(data.aggregatedStats.byDevice);
+    renderLocationsChart(data.aggregatedStats.byCountry);
+    
+    // Grouped Cards
+    renderCardGroups(data.cards);
+    
+    // Activity
+    renderActivity(data.cards);
+  }
+
+  // ---- Period selector (1 Day / 7 Days / 30 Days / Custom) ----
+  document.querySelectorAll('.period-btn').forEach(function (btn) {
+    btn.addEventListener('click', function () {
+      document.querySelectorAll('.period-btn').forEach(function (b) { b.classList.remove('active'); });
+      btn.classList.add('active');
+
+      var days = btn.getAttribute('data-days');
+      var customRow = document.getElementById('customRangeRow');
+
+      if (days === 'custom') {
+        customRow.classList.remove('hidden');
+        return; // wait for Apply
+      }
+      customRow.classList.add('hidden');
+      renderScansChart(ngzByDateData, parseInt(days, 10));
+    });
+  });
+
+  document.getElementById('applyCustomRange').addEventListener('click', function () {
+    var startVal = document.getElementById('customStartDate').value;
+    var endVal = document.getElementById('customEndDate').value;
+    if (!startVal || !endVal) return;
+
+    var start = new Date(startVal);
+    var end = new Date(endVal);
+    if (start > end) return;
+
+    renderScansChart(ngzByDateData, null, start, end);
+  });
+  
+  function renderScansChart(byDate, days, customStart, customEnd) {
+    var ctx = document.getElementById('scansChart').getContext('2d');
+
+    var labels = [];
+    var values = [];
+
+    if (customStart && customEnd) {
+      var cursor = new Date(customStart);
+      while (cursor <= customEnd) {
+        var dateStr = cursor.toISOString().split('T')[0];
+        labels.push(cursor.toLocaleDateString('en-US', { month: 'short', day: 'numeric' }));
+        values.push(byDate[dateStr] || 0);
+        cursor.setDate(cursor.getDate() + 1);
+      }
+    } else {
+      var rangeDays = days || 30;
+      for (var i = rangeDays - 1; i >= 0; i--) {
+        var d = new Date();
+        d.setDate(d.getDate() - i);
+        var dStr = d.toISOString().split('T')[0];
+        labels.push(rangeDays <= 1
+          ? d.toLocaleTimeString('en-US', { hour: 'numeric' })
+          : d.toLocaleDateString('en-US', { month: 'short', day: 'numeric' }));
+        values.push(byDate[dStr] || 0);
+      }
+    }
+
+    if (scansChart) scansChart.destroy();
+    scansChart = new Chart(ctx, {
+      type: 'line',
+      data: {
+        labels: labels,
+        datasets: [{
+          label: 'Scans',
+          data: values,
+          borderColor: '#667eea',
+          backgroundColor: 'rgba(102, 126, 234, 0.1)',
+          fill: true,
+          tension: 0.4,
+          borderWidth: 3,
+          pointBackgroundColor: '#667eea',
+          pointBorderColor: '#fff',
+          pointBorderWidth: 2,
+          pointRadius: 4,
+          pointHoverRadius: 7
+        }]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: { legend: { display: false } },
+        scales: {
+          y: { beginAtZero: true, grid: { color: '#f0f0f0' } },
+          x: { grid: { display: false } }
+        }
+      }
+    });
+  }
+  
+  function renderDevicesChart(byDevice) {
+    var ctx = document.getElementById('devicesChart').getContext('2d');
+    
+    var labels = Object.keys(byDevice);
+    var values = Object.values(byDevice);
+    var colors = ['#667eea', '#f093fb', '#4facfe', '#43e97b'];
+    
+    if (labels.length === 0) {
+      labels = ['No data'];
+      values = [1];
+      colors = ['#e0e0e0'];
+    }
+    
+    if (devicesChart) devicesChart.destroy();
+    devicesChart = new Chart(ctx, {
+      type: 'doughnut',
+      data: {
+        labels: labels,
+        datasets: [{
+          data: values,
+          backgroundColor: colors,
+          borderWidth: 0,
+          hoverOffset: 10
+        }]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        cutout: '60%',
+        plugins: {
+          legend: { position: 'bottom', labels: { padding: 16, usePointStyle: true } }
+        }
+      }
+    });
+  }
+  
+  function renderLocationsChart(byCountry) {
+    var ctx = document.getElementById('locationsChart').getContext('2d');
+    
+    var sorted = Object.entries(byCountry).sort(function(a, b) { return b[1] - a[1]; }).slice(0, 6);
+    var labels = sorted.map(function(x) { return x[0]; });
+    var values = sorted.map(function(x) { return x[1]; });
+    
+    if (labels.length === 0) {
+      labels = ['No data'];
+      values = [0];
+    }
+    
+    if (locationsChart) locationsChart.destroy();
+    locationsChart = new Chart(ctx, {
+      type: 'bar',
+      data: {
+        labels: labels,
+        datasets: [{
+          data: values,
+          backgroundColor: 'rgba(102, 126, 234, 0.8)',
+          borderRadius: 8
+        }]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: { legend: { display: false } },
+        scales: {
+          y: { beginAtZero: true, grid: { color: '#f0f0f0' } },
+          x: { grid: { display: false } }
+        }
+      }
+    });
+  }
+  
+  function renderCardGroups(cards) {
+    var container = document.getElementById('cardGroups');
+    var emptyState = document.getElementById('emptyState');
+    
+    if (cards.length === 0) {
+      container.innerHTML = '';
+      emptyState.classList.remove('hidden');
+      return;
+    }
+    
+    emptyState.classList.add('hidden');
+    
+    // Group cards by type
+    var groups = {
+      social: { name: 'Social Media Cards', icon: '📱', cards: [], scans: 0 },
+      menu: { name: 'Menu Cards', icon: '🍽️', cards: [], scans: 0 },
+      review: { name: 'Review Cards', icon: '⭐', cards: [], scans: 0 }
+    };
+    
+    cards.forEach(function(card) {
+      var type = card.cardType || 'social';
+      if (!groups[type]) type = 'social';
+      groups[type].cards.push(card);
+      groups[type].scans += card.scans || 0;
+    });
+    
+    container.innerHTML = '';
+    
+    Object.keys(groups).forEach(function(type) {
+      var group = groups[type];
+      if (group.cards.length === 0) return;
+      
+      var groupHtml = '<div class="card-group group-' + type + '" data-type="' + type + '">' +
+        '<div class="card-group-header" onclick="toggleGroup(this)">' +
+          '<div class="card-group-left">' +
+            '<div class="card-group-icon">' + group.icon + '</div>' +
+            '<div class="card-group-info">' +
+              '<h3>' + group.name + '</h3>' +
+              '<div class="card-group-meta">' +
+                '<span>📊 ' + group.scans + ' scans</span>' +
+              '</div>' +
+            '</div>' +
+          '</div>' +
+          '<div class="card-group-right">' +
+            '<div class="card-count-badge">' + group.cards.length + ' cards</div>' +
+            '<div class="expand-icon">▼</div>' +
+          '</div>' +
+        '</div>' +
+        '<div class="card-group-content">' +
+          '<div class="card-list">' +
+            group.cards.map(function(card) {
+              var safeUrl = (card.destinationUrl || '').replace(/'/g, "\\'");
+              return '<div class="card-list-item">' +
+                '<div class="card-list-info">' +
+                  '<div class="card-list-platform">' + getPlatformIcon(card.platform) + '</div>' +
+                  '<div class="card-list-details">' +
+                    '<h4>' + getPlatformName(card.platform) + '</h4>' +
+                    '<span class="card-list-code">' + card.cardId + '</span>' +
+                  '</div>' +
+                '</div>' +
+                '<div class="card-list-stats">' +
+                  '<div class="card-list-stat">' +
+                    '<div class="card-list-stat-value">' + (card.scans || 0) + '</div>' +
+                    '<div class="card-list-stat-label">Scans</div>' +
+                  '</div>' +
+                '</div>' +
+                '<div class="card-list-actions">' +
+                  '<button class="card-mini-btn secondary" onclick="event.stopPropagation(); window.ngzOpenEdit(\'' + card.cardId + '\', \'' + safeUrl + '\')">Edit</button>' +
+                  '<button class="card-mini-btn primary" onclick="event.stopPropagation(); window.open(\'' + card.destinationUrl + '\', \'_blank\')">Test</button>' +
+                '</div>' +
+              '</div>';
+            }).join('') +
+          '</div>' +
+        '</div>' +
+      '</div>';
+      
+      container.innerHTML += groupHtml;
+    });
+  }
+  
+  // Toggle group expansion
+  window.toggleGroup = function(header) {
+    var group = header.closest('.card-group');
+    group.classList.toggle('expanded');
+  };
+
+  // ---- Inline edit modal ----
+  var ngzEditingCardId = null;
+
+  window.ngzOpenEdit = function (cardId, currentUrl) {
+    ngzEditingCardId = cardId;
+    document.getElementById('ngzEditCardId').textContent = cardId;
+    document.getElementById('ngzEditUrlInput').value = currentUrl || '';
+    document.getElementById('ngzEditError').textContent = '';
+    document.getElementById('ngzEditOverlay').classList.add('show');
+    document.getElementById('ngzEditUrlInput').focus();
+  };
+
+  function ngzCloseEdit() {
+    document.getElementById('ngzEditOverlay').classList.remove('show');
+    ngzEditingCardId = null;
+  }
+
+  document.getElementById('ngzEditCancelBtn').addEventListener('click', ngzCloseEdit);
+  document.getElementById('ngzEditOverlay').addEventListener('click', function (e) {
+    if (e.target.id === 'ngzEditOverlay') ngzCloseEdit();
+  });
+
+  document.getElementById('ngzEditSaveBtn').addEventListener('click', function () {
+    var newUrl = document.getElementById('ngzEditUrlInput').value.trim();
+    var errorEl = document.getElementById('ngzEditError');
+    errorEl.textContent = '';
+
+    if (!newUrl || (!newUrl.startsWith('http://') && !newUrl.startsWith('https://'))) {
+      errorEl.textContent = 'Enter a valid URL starting with http:// or https://';
+      return;
+    }
+
+    var token = localStorage.getItem('nfc_token');
+    var email = localStorage.getItem('nfc_user_email');
+    var btn = document.getElementById('ngzEditSaveBtn');
+    btn.disabled = true;
+    btn.textContent = 'Saving...';
+
+    fetch(API_URL + '/api/setup', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': 'Bearer ' + token
+      },
+      body: JSON.stringify({
+        cardId: ngzEditingCardId,
+        destinationUrl: newUrl,
+        email: email
+      })
+    })
+    .then(function (r) { return r.json(); })
+    .then(function (data) {
+      btn.disabled = false;
+      btn.textContent = 'Save Changes';
+
+      if (!data.success) {
+        errorEl.textContent = data.error || 'Failed to save. Try again.';
+        return;
+      }
+
+      ngzCloseEdit();
+      loadDashboardData(token);
+    })
+    .catch(function () {
+      btn.disabled = false;
+      btn.textContent = 'Save Changes';
+      errorEl.textContent = 'Something went wrong. Try again.';
+    });
+  });
+  
+  function renderActivity(cards) {
+    var container = document.getElementById('activityList');
+    
+    var allScans = [];
+    cards.forEach(function(card) {
+      (card.recentScans || []).forEach(function(scan) {
+        allScans.push({ cardId: card.cardId, platform: card.platform, ...scan });
+      });
+    });
+    
+    allScans.sort(function(a, b) { return new Date(b.timestamp) - new Date(a.timestamp); });
+    
+    var recentScans = allScans.slice(0, 12);
+    
+    if (recentScans.length === 0) {
+      container.innerHTML = '<p style="text-align: center; color: #64748b; padding: 40px; grid-column: 1/-1;">No scans yet. Share your cards to start tracking!</p>';
+      return;
+    }
+    
+    container.innerHTML = recentScans.map(function(scan) {
+      return '<div class="activity-item">' +
+        '<div class="activity-icon">' + getDeviceIcon(scan.deviceType) + '</div>' +
+        '<div class="activity-details">' +
+          '<div class="activity-text">Card <strong>' + scan.cardId + '</strong> scanned</div>' +
+          '<div class="activity-meta">' +
+            '<span>📍 ' + scan.city + ', ' + scan.country + '</span>' +
+            '<span>📱 ' + scan.deviceType + '</span>' +
+          '</div>' +
+        '</div>' +
+        '<div class="activity-time">' + getTimeAgo(scan.timestamp) + '</div>' +
+      '</div>';
+    }).join('');
+  }
+  
+  function getPlatformIcon(p) {
+    var icons = { google: '⭐', instagram: '📷', tiktok: '🎵', facebook: '👍', snapchat: '👻', menu: '🍽️', other: '🔗' };
+    return icons[p] || '🔗';
+  }
+  
+  function getPlatformName(p) {
+    var names = { google: 'Google Review', instagram: 'Instagram', tiktok: 'TikTok', facebook: 'Facebook', snapchat: 'Snapchat', menu: 'Digital Menu', other: 'Custom Link' };
+    return names[p] || p || 'Unknown';
+  }
+  
+  function getDeviceIcon(d) {
+    if (d === 'iOS' || d === 'Android') return '📱';
+    if (d === 'Desktop') return '💻';
+    return '📱';
+  }
+  
+  function getTimeAgo(ts) {
+    var s = Math.floor((new Date() - new Date(ts)) / 1000);
+    if (s < 60) return 'Just now';
+    if (s < 3600) return Math.floor(s / 60) + 'm ago';
+    if (s < 86400) return Math.floor(s / 3600) + 'h ago';
+    return Math.floor(s / 86400) + 'd ago';
+  }
+  
+});
+</script>
+
+</body>
+</html>

@@ -1,0 +1,800 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Activate Your NFC Card | NGTAPZ</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Poppins:wght@600;700;800&display=swap');
+
+.activation-wrapper {
+  min-height: 100vh;
+  background: #12121f;
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+  font-size: 18px;
+  overflow: hidden;
+}
+
+.bg-gradient {
+  position: absolute;
+  inset: 0;
+  background:
+    radial-gradient(ellipse at 15% 15%, rgba(124, 92, 255, 0.25) 0%, transparent 45%),
+    radial-gradient(ellipse at 85% 85%, rgba(240, 147, 251, 0.18) 0%, transparent 45%);
+}
+
+.grid-pattern {
+  position: absolute;
+  inset: 0;
+  background-image:
+    linear-gradient(rgba(255,255,255,0.025) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255,255,255,0.025) 1px, transparent 1px);
+  background-size: 56px 56px;
+}
+
+.activation-container {
+  position: relative;
+  z-index: 10;
+  max-width: 1360px;
+  margin: 0 auto;
+  padding: 64px 48px;
+  display: grid;
+  grid-template-columns: 0.8fr 1fr;
+  gap: 64px;
+  align-items: center;
+  min-height: 100vh;
+}
+
+/* ---------- LEFT: HERO ---------- */
+.hero-section { color: #fff; }
+
+.hero-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  background: rgba(255,255,255,0.08);
+  border: 1px solid rgba(255,255,255,0.15);
+  padding: 8px 16px;
+  border-radius: 50px;
+  font-size: 1rem;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  margin-bottom: 24px;
+}
+
+.hero-badge .pulse-dot {
+  width: 8px; height: 8px;
+  background: #4ade80;
+  border-radius: 50%;
+  box-shadow: 0 0 8px #4ade80;
+}
+
+.hero-title {
+  font-family: 'Poppins', sans-serif;
+  font-size: 3.6rem;
+  font-weight: 800;
+  line-height: 1.08;
+  margin-bottom: 18px;
+  letter-spacing: -0.02em;
+}
+
+.hero-title .gradient-text {
+  background: linear-gradient(135deg, #a78bfa 0%, #f0abfc 60%, #7dd3fc 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.hero-subtitle {
+  font-size: 1.3rem;
+  line-height: 1.6;
+  color: rgba(255,255,255,0.72);
+  margin-bottom: 36px;
+  max-width: 420px;
+}
+
+.feature-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-bottom: 36px;
+}
+
+.feature-pill {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 11px 18px;
+  background: rgba(255,255,255,0.06);
+  border: 1px solid rgba(255,255,255,0.1);
+  border-radius: 10px;
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: rgba(255,255,255,0.9);
+}
+
+.stats-row {
+  display: flex;
+  gap: 36px;
+  padding-top: 24px;
+  border-top: 1px solid rgba(255,255,255,0.1);
+}
+
+.stat-value {
+  font-family: 'Poppins', sans-serif;
+  font-size: 1.85rem;
+  font-weight: 700;
+  color: #fff;
+}
+
+.stat-label {
+  font-size: 0.85rem;
+  color: rgba(255,255,255,0.5);
+  margin-top: 2px;
+}
+
+/* ---------- RIGHT: FORM ---------- */
+.form-card {
+  background: #fff;
+  border-radius: 20px;
+  padding: 44px 48px;
+  box-shadow: 0 25px 70px rgba(0,0,0,0.35);
+  position: relative;
+  max-height: 90vh;
+  overflow-y: auto;
+  font-size: 18px;
+}
+
+.form-card::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: 4px;
+  background: linear-gradient(90deg, #7c5cff, #f0abfc, #7dd3fc);
+}
+
+.form-header {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  margin-bottom: 24px;
+}
+
+.form-header h2 {
+  font-family: 'Poppins', sans-serif;
+  font-size: 2rem;
+  font-weight: 700;
+  color: #111;
+}
+
+.step-indicator {
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: #7c5cff;
+  background: #f2effe;
+  padding: 5px 12px;
+  border-radius: 20px;
+}
+
+.error-msg {
+  background: #fef2f2;
+  border: 1px solid #fca5a5;
+  border-radius: 10px;
+  padding: 13px 17px;
+  color: #dc2626;
+  font-size: 1rem;
+  margin-bottom: 18px;
+  display: none;
+  align-items: center;
+  gap: 10px;
+}
+.error-msg.show { display: flex; }
+
+.field-section-label {
+  font-size: 0.95rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: #7c5cff;
+  margin: 26px 0 16px;
+}
+.field-section-label:first-child { margin-top: 0; }
+
+.form-row-2 {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+}
+
+.form-group { margin-bottom: 18px; }
+
+.form-label {
+  display: block;
+  font-weight: 600;
+  font-size: 1.05rem;
+  color: #1e293b;
+  margin-bottom: 8px;
+}
+
+.form-input, .form-select {
+  width: 100%;
+  padding: 15px 18px;
+  border: 1.5px solid #e2e8f0;
+  border-radius: 10px;
+  font-size: 1.15rem;
+  font-family: inherit;
+  background: #fff;
+  transition: border-color 0.15s ease, box-shadow 0.15s ease;
+}
+
+.form-input:focus, .form-select:focus {
+  outline: none;
+  border-color: #7c5cff;
+  box-shadow: 0 0 0 3px rgba(124,92,255,0.12);
+}
+
+.form-select {
+  cursor: pointer;
+  appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='20' height='20' viewBox='0 0 24 24' fill='none' stroke='%2364748b' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 12px center;
+  background-size: 16px;
+}
+
+.form-hint {
+  font-size: 0.9rem;
+  color: #94a3b8;
+  margin-top: 6px;
+}
+
+.form-hint.checking { color: #94a3b8; }
+.form-hint.valid { color: #16a34a; font-weight: 600; }
+.form-hint.invalid { color: #dc2626; font-weight: 600; }
+
+.form-input.valid { border-color: #86efac; }
+.form-input.invalid { border-color: #fca5a5; }
+
+.mini-note {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  background: #f8f7ff;
+  border: 1px solid #e9e5ff;
+  border-radius: 10px;
+  padding: 16px 18px;
+  margin-bottom: 20px;
+  font-size: 1rem;
+  color: #5b4bc4;
+  line-height: 1.5;
+}
+
+.submit-btn {
+  width: 100%;
+  padding: 19px 24px;
+  background: linear-gradient(135deg, #7c5cff 0%, #a855f7 100%);
+  color: #fff;
+  border: none;
+  border-radius: 12px;
+  font-size: 1.2rem;
+  font-weight: 700;
+  cursor: pointer;
+  margin-top: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
+}
+
+.submit-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 12px 30px rgba(124,92,255,0.35);
+}
+
+.submit-btn:disabled { opacity: 0.6; cursor: not-allowed; transform: none; }
+
+.login-link {
+  text-align: center;
+  margin-top: 20px;
+  font-size: 1.05rem;
+  color: #94a3b8;
+}
+.login-link a { color: #7c5cff; font-weight: 600; text-decoration: none; }
+
+/* Success */
+.success-container { display: none; text-align: center; padding: 12px 0; }
+.success-container.show { display: block; }
+
+.success-icon {
+  width: 72px; height: 72px;
+  background: linear-gradient(135deg, #22c55e, #16a34a);
+  border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  margin: 0 auto 20px;
+  font-size: 2rem;
+  color: #fff;
+  box-shadow: 0 10px 30px rgba(34,197,94,0.3);
+}
+
+.success-container h2 {
+  font-family: 'Poppins', sans-serif;
+  font-size: 1.5rem;
+  color: #111;
+  margin-bottom: 6px;
+}
+.success-container > p { color: #64748b; margin-bottom: 22px; }
+
+.success-details {
+  background: #f8fafc;
+  border-radius: 12px;
+  padding: 16px 20px;
+  margin-bottom: 22px;
+  text-align: left;
+  border: 1px solid #e2e8f0;
+}
+.success-detail-row {
+  display: flex; justify-content: space-between;
+  padding: 10px 0; border-bottom: 1px solid #e2e8f0;
+  font-size: 0.9rem;
+}
+.success-detail-row:last-child { border-bottom: none; }
+.success-detail-label { color: #94a3b8; }
+.success-detail-value { font-weight: 700; color: #111; }
+
+.success-buttons { display: flex; gap: 12px; }
+.success-btn {
+  flex: 1; padding: 13px 20px; border-radius: 10px;
+  font-size: 0.9rem; font-weight: 700; cursor: pointer;
+  text-decoration: none; text-align: center; border: none;
+  font-family: inherit;
+}
+.success-btn-primary { background: linear-gradient(135deg, #7c5cff, #a855f7); color: #fff; }
+.success-btn-secondary { background: #f1f5f9; color: #64748b; border: 1.5px solid #e2e8f0; }
+
+.hidden { display: none !important; }
+
+/* ---------- RESPONSIVE ---------- */
+@media (max-width: 1100px) {
+  .activation-container {
+    grid-template-columns: 1fr;
+    gap: 40px;
+    padding: 40px 32px;
+    max-width: 640px;
+  }
+  .hero-section { text-align: center; }
+  .hero-subtitle { margin-left: auto; margin-right: auto; }
+  .feature-row, .stats-row { justify-content: center; }
+  .hero-title { font-size: 2.4rem; }
+  .form-card { max-height: none; }
+}
+
+@media (max-width: 560px) {
+  .activation-container { padding: 28px 20px; }
+  .form-card { padding: 26px 22px; }
+  .form-row-2 { grid-template-columns: 1fr; }
+  .hero-title { font-size: 2rem; }
+  .stats-row { flex-wrap: wrap; gap: 20px; }
+  .success-buttons { flex-direction: column; }
+}
+</style>
+</head>
+<body>
+
+
+<div class="activation-wrapper">
+  <div class="bg-gradient"></div>
+  <div class="grid-pattern"></div>
+
+  <div class="activation-container">
+
+    <!-- LEFT: HERO -->
+    <div class="hero-section">
+      <div class="hero-badge">
+        <span class="pulse-dot"></span>
+        Free setup · No credit card required
+      </div>
+
+      <h1 class="hero-title">
+        Activate your<br><span class="gradient-text">NFC card</span>
+      </h1>
+
+      <p class="hero-subtitle">
+        Set your card's destination and unlock real-time scan analytics — location, device, and traffic, all free.
+      </p>
+
+      <div class="feature-row">
+        <div class="feature-pill">📊 Free dashboard</div>
+        <div class="feature-pill">🌍 Location tracking</div>
+        <div class="feature-pill">🔄 Update link anytime</div>
+      </div>
+
+      <div class="stats-row">
+        <div>
+          <div class="stat-value">10K+</div>
+          <div class="stat-label">Cards activated</div>
+        </div>
+        <div>
+          <div class="stat-value">50K+</div>
+          <div class="stat-label">Scans tracked</div>
+        </div>
+        <div>
+          <div class="stat-value">99.9%</div>
+          <div class="stat-label">Uptime</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- RIGHT: FORM -->
+    <div class="form-card">
+
+      <div class="form-header">
+        <h2>Set up your card</h2>
+        <span class="step-indicator" id="stepIndicator">Step 1 of 1</span>
+      </div>
+
+      <div id="errorMsg" class="error-msg">
+        <span>⚠️</span>
+        <span id="errorText">Error message</span>
+      </div>
+
+      <!-- FORM -->
+      <div id="setupForm">
+
+        <div class="field-section-label">Card details</div>
+
+        <div class="form-group">
+          <label class="form-label">Card code</label>
+          <input type="text" id="cardId" class="form-input" placeholder="e.g. A1B2C3" style="text-transform: uppercase;">
+          <p class="form-hint" id="cardIdHint">Printed on the back of your card</p>
+        </div>
+
+        <div class="form-row-2">
+          <div class="form-group">
+            <label class="form-label">Card type</label>
+            <select id="cardType" class="form-select">
+              <option value="social">Social Media Card</option>
+              <option value="menu">Menu Card</option>
+              <option value="review">Review Card</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Platform</label>
+            <select id="platform" class="form-select">
+              <option value="google">⭐ Google Review</option>
+              <option value="instagram">📷 Instagram</option>
+              <option value="tiktok">🎵 TikTok</option>
+              <option value="facebook">👍 Facebook</option>
+              <option value="snapchat">👻 Snapchat</option>
+              <option value="menu">🍽️ Digital Menu</option>
+              <option value="other">🔗 Other Link</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Destination URL</label>
+          <input type="url" id="destinationUrl" class="form-input" placeholder="https://your-link.com">
+          <p class="form-hint">Where should this card send people?</p>
+        </div>
+
+        <div class="field-section-label">Your account</div>
+
+        <div class="mini-note">
+          Create a free account to manage this card and track its scans. Use the same email across cards to see them all in one dashboard.
+        </div>
+
+        <div class="form-row-2">
+          <div class="form-group">
+            <label class="form-label">Email address</label>
+            <input type="email" id="email" class="form-input" placeholder="your@email.com" autocomplete="email">
+          </div>
+          <div class="form-group">
+            <label class="form-label">Confirm email address</label>
+            <input type="email" id="emailConfirm" class="form-input" placeholder="Retype your email" autocomplete="off" onpaste="return false;">
+            <p class="form-hint" id="emailMatchHint"></p>
+          </div>
+        </div>
+
+        <div class="form-row-2">
+          <div class="form-group">
+            <label class="form-label">Password</label>
+            <input type="password" id="password" class="form-input" placeholder="Min 6 characters" autocomplete="new-password">
+          </div>
+          <div class="form-group">
+            <label class="form-label">Confirm password</label>
+            <input type="password" id="passwordConfirm" class="form-input" placeholder="Retype your password" autocomplete="new-password" onpaste="return false;">
+            <p class="form-hint" id="passwordMatchHint"></p>
+          </div>
+        </div>
+
+        <button type="button" id="submitBtn" class="submit-btn">
+          Activate my card
+          <span class="arrow">→</span>
+        </button>
+
+        <p class="login-link">
+          Already activated? <a href="/pages/my-analytics">Go to dashboard</a>
+        </p>
+
+      </div>
+
+      <!-- SUCCESS -->
+      <div id="successContainer" class="success-container">
+        <div class="success-icon">✓</div>
+        <h2>Card activated!</h2>
+        <p>Your NFC card is ready to use.</p>
+
+        <div class="success-details">
+          <div class="success-detail-row">
+            <span class="success-detail-label">Card code</span>
+            <span class="success-detail-value" id="successCardId">-</span>
+          </div>
+          <div class="success-detail-row">
+            <span class="success-detail-label">Platform</span>
+            <span class="success-detail-value" id="successPlatform">-</span>
+          </div>
+          <div class="success-detail-row">
+            <span class="success-detail-label">Destination</span>
+            <span class="success-detail-value" id="successUrl" style="font-size: 0.8rem; word-break: break-all;">-</span>
+          </div>
+        </div>
+
+        <div class="success-buttons">
+          <a href="/pages/my-analytics" class="success-btn success-btn-primary">View dashboard →</a>
+          <button onclick="location.reload()" class="success-btn success-btn-secondary">Activate another</button>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+
+  const API_URL = 'https://nfc-redirect.ngoodiezllc.workers.dev';
+
+  // ---- Live card code validation setup (must come BEFORE anything calls checkCardCode) ----
+  var cardIdInput = document.getElementById('cardId');
+  var cardIdHint = document.getElementById('cardIdHint');
+  var cardCodeIsValid = null; // null = not checked yet, true/false once checked
+  var checkTimer = null;
+
+  var urlParams = new URLSearchParams(window.location.search);
+  var cardFromUrl = urlParams.get('card');
+  if (cardFromUrl) {
+    document.getElementById('cardId').value = cardFromUrl.toUpperCase();
+    checkCardCode(cardFromUrl.toUpperCase());
+  }
+
+  cardIdInput.addEventListener('input', function () {
+    cardCodeIsValid = null;
+    cardIdInput.classList.remove('valid', 'invalid');
+    cardIdHint.className = 'form-hint';
+    cardIdHint.textContent = 'Printed on the back of your card';
+
+    var value = cardIdInput.value.trim().toUpperCase();
+    clearTimeout(checkTimer);
+    if (!value) return;
+
+    checkTimer = setTimeout(function () {
+      checkCardCode(value);
+    }, 400); // debounce while typing
+  });
+
+  function checkCardCode(code) {
+    if (!code) return;
+    cardIdHint.className = 'form-hint checking';
+    cardIdHint.textContent = 'Checking code...';
+
+    fetch(API_URL + '/api/check-code?card=' + encodeURIComponent(code))
+      .then(function (r) { return r.json(); })
+      .then(function (data) {
+        if (!data.success) {
+          cardCodeIsValid = null;
+          cardIdHint.className = 'form-hint';
+          cardIdHint.textContent = 'Printed on the back of your card';
+          return;
+        }
+
+        if (!data.exists) {
+          cardCodeIsValid = false;
+          cardIdInput.classList.add('invalid');
+          cardIdHint.className = 'form-hint invalid';
+          cardIdHint.textContent = '✗ Card not found — double check the code printed on your card';
+        } else if (data.activated) {
+          cardCodeIsValid = true;
+          cardIdInput.classList.add('valid');
+          cardIdHint.className = 'form-hint valid';
+          cardIdHint.textContent = '✓ Valid card — already activated, this will update its link';
+        } else {
+          cardCodeIsValid = true;
+          cardIdInput.classList.add('valid');
+          cardIdHint.className = 'form-hint valid';
+          cardIdHint.textContent = '✓ Valid card — ready to activate';
+        }
+      })
+      .catch(function () {
+        // Network hiccup: don't block the user, just fall back to no live-check
+        cardCodeIsValid = null;
+        cardIdHint.className = 'form-hint';
+        cardIdHint.textContent = 'Printed on the back of your card';
+      });
+  }
+
+  // ---- Live email-match validation ----
+  var emailInput = document.getElementById('email');
+  var emailConfirmInput = document.getElementById('emailConfirm');
+  var emailMatchHint = document.getElementById('emailMatchHint');
+
+  function checkEmailMatch() {
+    var email = emailInput.value.trim().toLowerCase();
+    var confirm = emailConfirmInput.value.trim().toLowerCase();
+
+    emailConfirmInput.classList.remove('valid', 'invalid');
+
+    if (!confirm) {
+      emailMatchHint.className = 'form-hint';
+      emailMatchHint.textContent = '';
+      return;
+    }
+    if (email === confirm) {
+      emailConfirmInput.classList.add('valid');
+      emailMatchHint.className = 'form-hint valid';
+      emailMatchHint.textContent = '✓ Emails match';
+    } else {
+      emailConfirmInput.classList.add('invalid');
+      emailMatchHint.className = 'form-hint invalid';
+      emailMatchHint.textContent = '✗ Does not match the email above';
+    }
+  }
+
+  emailInput.addEventListener('input', checkEmailMatch);
+  emailConfirmInput.addEventListener('input', checkEmailMatch);
+
+  // ---- Live password-match validation ----
+  var passwordInput = document.getElementById('password');
+  var passwordConfirmInput = document.getElementById('passwordConfirm');
+  var passwordMatchHint = document.getElementById('passwordMatchHint');
+
+  function checkPasswordMatch() {
+    var pw = passwordInput.value;
+    var confirm = passwordConfirmInput.value;
+
+    passwordConfirmInput.classList.remove('valid', 'invalid');
+
+    if (!confirm) {
+      passwordMatchHint.className = 'form-hint';
+      passwordMatchHint.textContent = '';
+      return;
+    }
+    if (pw === confirm) {
+      passwordConfirmInput.classList.add('valid');
+      passwordMatchHint.className = 'form-hint valid';
+      passwordMatchHint.textContent = '✓ Passwords match';
+    } else {
+      passwordConfirmInput.classList.add('invalid');
+      passwordMatchHint.className = 'form-hint invalid';
+      passwordMatchHint.textContent = '✗ Does not match the password above';
+    }
+  }
+
+  passwordInput.addEventListener('input', checkPasswordMatch);
+  passwordConfirmInput.addEventListener('input', checkPasswordMatch);
+
+  document.getElementById('submitBtn').addEventListener('click', function() {
+
+    var cardId = document.getElementById('cardId').value.trim().toUpperCase();
+    var cardType = document.getElementById('cardType').value;
+    var platform = document.getElementById('platform').value;
+    var destinationUrl = document.getElementById('destinationUrl').value.trim();
+    var email = document.getElementById('email').value.trim().toLowerCase();
+    var emailConfirm = document.getElementById('emailConfirm').value.trim().toLowerCase();
+    var password = document.getElementById('password').value;
+
+    var errorDiv = document.getElementById('errorMsg');
+    var errorText = document.getElementById('errorText');
+    errorDiv.className = 'error-msg';
+
+    if (!cardId) {
+      errorText.textContent = 'Please enter your card code';
+      errorDiv.className = 'error-msg show';
+      return;
+    }
+    if (cardCodeIsValid === false) {
+      errorText.textContent = 'This card code was not found. Please check the code printed on your card.';
+      errorDiv.className = 'error-msg show';
+      return;
+    }
+    if (!destinationUrl) {
+      errorText.textContent = 'Please enter your destination URL';
+      errorDiv.className = 'error-msg show';
+      return;
+    }
+    if (!destinationUrl.startsWith('http://') && !destinationUrl.startsWith('https://')) {
+      errorText.textContent = 'URL must start with http:// or https://';
+      errorDiv.className = 'error-msg show';
+      return;
+    }
+    if (!email) {
+      errorText.textContent = 'Please enter your email address';
+      errorDiv.className = 'error-msg show';
+      return;
+    }
+    if (!emailConfirm) {
+      errorText.textContent = 'Please retype your email address to confirm it';
+      errorDiv.className = 'error-msg show';
+      return;
+    }
+    if (email !== emailConfirm) {
+      errorText.textContent = 'The two email addresses do not match. Please check for typos.';
+      errorDiv.className = 'error-msg show';
+      return;
+    }
+    if (!password || password.length < 6) {
+      errorText.textContent = 'Password must be at least 6 characters';
+      errorDiv.className = 'error-msg show';
+      return;
+    }
+    var passwordConfirmVal = document.getElementById('passwordConfirm').value;
+    if (!passwordConfirmVal) {
+      errorText.textContent = 'Please retype your password to confirm it';
+      errorDiv.className = 'error-msg show';
+      return;
+    }
+    if (password !== passwordConfirmVal) {
+      errorText.textContent = 'The two passwords do not match. Please check for typos.';
+      errorDiv.className = 'error-msg show';
+      return;
+    }
+
+    var btn = document.getElementById('submitBtn');
+    btn.disabled = true;
+    btn.innerHTML = 'Activating...';
+
+    fetch(API_URL + '/api/setup', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        cardId: cardId,
+        cardType: cardType,
+        platform: platform,
+        destinationUrl: destinationUrl,
+        email: email,
+        password: password
+      })
+    })
+    .then(function(response) { return response.json(); })
+    .then(function(data) {
+      if (data.success) {
+        if (data.token) {
+          localStorage.setItem('nfc_token', data.token);
+          localStorage.setItem('nfc_user_email', email);
+        }
+
+        document.getElementById('setupForm').classList.add('hidden');
+        document.getElementById('successCardId').textContent = cardId;
+        document.getElementById('successPlatform').textContent = platform;
+        document.getElementById('successUrl').textContent = destinationUrl;
+        document.getElementById('successContainer').className = 'success-container show';
+        document.getElementById('stepIndicator').textContent = 'Done';
+
+      } else {
+        throw new Error(data.error || 'Activation failed');
+      }
+    })
+    .catch(function(error) {
+      errorText.textContent = error.message || 'Something went wrong. Please try again.';
+      errorDiv.className = 'error-msg show';
+      btn.disabled = false;
+      btn.innerHTML = 'Activate my card <span class="arrow">→</span>';
+    });
+
+  });
+
+});
+</script>
+
+</body>
+</html>
