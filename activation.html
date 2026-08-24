@@ -4,6 +4,15 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Activate Your NFC Card | NGTAPZ</title>
+<!--
+  GOOGLE PLACES SETUP REQUIRED:
+  1. Get a Google Maps Platform API key: console.cloud.google.com
+     - Enable "Places API" for your project
+     - Restrict the key to your domain (ngtapz.com) for security
+  2. Replace YOUR_GOOGLE_MAPS_API_KEY below with your real key
+  Free tier covers typical small-business volume; see cloud.google.com/maps-platform/pricing
+-->
+<script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDw3mJR9jdREC_FyR6NEFE241JCLRFwXlk&libraries=places&callback=ngzInitGooglePlaces" async defer></script>
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Poppins:wght@600;700;800&display=swap');
 
@@ -255,6 +264,31 @@
 .form-input.valid { border-color: #86efac; }
 .form-input.invalid { border-color: #fca5a5; }
 
+.business-confirmed {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  background: #f0fdf4;
+  border: 1.5px solid #86efac;
+  border-radius: 10px;
+  padding: 12px 14px;
+  margin-top: 8px;
+  font-size: 0.9rem;
+  color: #166534;
+}
+.business-confirmed .biz-icon { font-size: 1.1rem; }
+.business-confirmed .biz-name { font-weight: 700; }
+.business-confirmed button {
+  margin-left: auto;
+  background: none;
+  border: none;
+  color: #16a34a;
+  font-size: 0.8rem;
+  font-weight: 600;
+  cursor: pointer;
+  text-decoration: underline;
+}
+
 .mini-note {
   display: flex;
   align-items: flex-start;
@@ -472,6 +506,12 @@
           </div>
         </div>
 
+        <div id="googleBusinessSearchGroup" class="form-group hidden">
+          <label class="form-label">Find your business</label>
+          <input type="text" id="googleBusinessSearch" class="form-input" placeholder="Start typing your business name...">
+          <p class="form-hint" id="googleBusinessHint">Select your business from the dropdown — your review link fills in automatically.</p>
+        </div>
+
         <div class="form-group">
           <label class="form-label">Destination URL</label>
           <input type="url" id="destinationUrl" class="form-input" placeholder="https://your-link.com">
@@ -551,9 +591,87 @@
 </div>
 
 <script>
+  // ---- Google Places Autocomplete (for Google Review business search) ----
+  // Called automatically by the Google Maps script once it finishes loading.
+  var ngzPlacesAutocomplete = null;
+  var ngzSelectedPlace = null;
+
+  function ngzInitGooglePlaces() {
+    var input = document.getElementById('googleBusinessSearch');
+    if (!input || typeof google === 'undefined') return;
+
+    ngzPlacesAutocomplete = new google.maps.places.Autocomplete(input, {
+      types: ['establishment'],
+      fields: ['place_id', 'name', 'formatted_address']
+    });
+
+    ngzPlacesAutocomplete.addListener('place_changed', function () {
+      var place = ngzPlacesAutocomplete.getPlace();
+      if (!place || !place.place_id) return;
+
+      ngzSelectedPlace = place;
+      var reviewUrl = 'https://search.google.com/local/writereview?placeid=' + place.place_id;
+      var destInput = document.getElementById('destinationUrl');
+      destInput.value = reviewUrl;
+      destInput.dispatchEvent(new Event('input')); // trigger any listeners depending on it
+
+      ngzShowBusinessConfirmed(place.name, place.formatted_address);
+    });
+  }
+
+  function ngzShowBusinessConfirmed(name, address) {
+    var group = document.getElementById('googleBusinessSearchGroup');
+    var existing = document.getElementById('ngzBusinessConfirmed');
+    if (existing) existing.remove();
+
+    var box = document.createElement('div');
+    box.id = 'ngzBusinessConfirmed';
+    box.className = 'business-confirmed';
+    box.innerHTML =
+      '<span class="biz-icon">✓</span>' +
+      '<span><span class="biz-name">' + escapeHtmlNgz(name) + '</span>' +
+      (address ? ' — ' + escapeHtmlNgz(address) : '') + '</span>' +
+      '<button type="button" id="ngzClearBusiness">Change</button>';
+    group.appendChild(box);
+
+    document.getElementById('ngzClearBusiness').addEventListener('click', function () {
+      box.remove();
+      document.getElementById('googleBusinessSearch').value = '';
+      document.getElementById('destinationUrl').value = '';
+      ngzSelectedPlace = null;
+    });
+  }
+
+  function escapeHtmlNgz(str) {
+    if (!str) return '';
+    var div = document.createElement('div');
+    div.textContent = str;
+    return div.innerHTML;
+  }
+</script>
+
+<script>
 document.addEventListener('DOMContentLoaded', function() {
 
   const API_URL = 'https://nfc-redirect.ngoodiezllc.workers.dev';
+
+  // ---- Show/hide the business search field based on selected platform ----
+  var platformSelect = document.getElementById('platform');
+  var googleSearchGroup = document.getElementById('googleBusinessSearchGroup');
+  var destUrlInput = document.getElementById('destinationUrl');
+
+  function ngzTogglePlatformFields() {
+    if (platformSelect.value === 'google') {
+      googleSearchGroup.classList.remove('hidden');
+      destUrlInput.placeholder = 'Fills in automatically once you pick your business above';
+    } else {
+      googleSearchGroup.classList.add('hidden');
+      destUrlInput.placeholder = 'https://your-link.com';
+    }
+  }
+
+  platformSelect.addEventListener('change', ngzTogglePlatformFields);
+  ngzTogglePlatformFields(); // run once on load in case "Google Review" is already selected
 
   // ---- Live card code validation setup (must come BEFORE anything calls checkCardCode) ----
   var cardIdInput = document.getElementById('cardId');
