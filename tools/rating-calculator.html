@@ -1,0 +1,220 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Google Star Rating Calculator | NGTAPZ Tools</title>
+<meta name="description" content="See exactly how many 5-star reviews you need to reach your target Google rating.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --paper: #F3F5F7; --paper-dim: #E7EBEF;
+    --ink: #12203A; --ink-soft: #4B5A72;
+    --cobalt: #2E5CFF; --coral: #FF7A59; --steel: #B8BEC7; --white: #FFFFFF;
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+    background: var(--paper); color: var(--ink); line-height: 1.5;
+    -webkit-font-smoothing: antialiased;
+  }
+  a { color: inherit; text-decoration: none; }
+  .wrap { max-width: 900px; margin: 0 auto; padding: 0 32px; }
+
+  .nav {
+    position: sticky; top: 0; z-index: 50;
+    background: rgba(243, 245, 247, 0.9); backdrop-filter: blur(10px);
+    border-bottom: 1px solid var(--paper-dim);
+  }
+  .nav-inner { max-width: 1180px; margin: 0 auto; padding: 18px 32px; display: flex; align-items: center; justify-content: space-between; }
+  .logo { font-family: 'Space Grotesk', sans-serif; font-weight: 700; font-size: 1.2rem; }
+  .logo .dot { color: var(--coral); }
+  .back-link { font-size: 0.85rem; color: var(--ink-soft); font-weight: 500; }
+  .back-link:hover { color: var(--ink); }
+
+  .hero { padding: 56px 0 8px; text-align: center; }
+  .eyebrow {
+    display: inline-flex; align-items: center; gap: 8px;
+    font-family: 'JetBrains Mono', monospace; font-size: 0.78rem; font-weight: 500;
+    color: var(--coral); background: rgba(255, 122, 89, 0.08);
+    border: 1px solid rgba(255, 122, 89, 0.2); padding: 6px 14px; border-radius: 20px; margin-bottom: 24px;
+  }
+  h1 {
+    font-family: 'Space Grotesk', sans-serif; font-weight: 700;
+    font-size: clamp(2rem, 4vw, 2.6rem); letter-spacing: -0.02em; margin-bottom: 14px;
+  }
+  .hero p { color: var(--ink-soft); font-size: 1.05rem; max-width: 480px; margin: 0 auto; }
+
+  .calc-card {
+    background: var(--white); border-radius: 20px; border: 1px solid var(--paper-dim);
+    padding: 40px; margin: 48px 0; box-shadow: 0 20px 50px -24px rgba(18,32,58,0.15);
+  }
+
+  .input-row { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; margin-bottom: 32px; }
+  .field label {
+    display: block; font-weight: 600; font-size: 0.85rem; margin-bottom: 8px; color: var(--ink-soft);
+  }
+  .field input {
+    width: 100%; padding: 14px 16px; border: 1.5px solid var(--paper-dim); border-radius: 10px;
+    font-size: 1.1rem; font-family: 'JetBrains Mono', monospace; font-weight: 700; color: var(--ink);
+  }
+  .field input:focus { outline: none; border-color: var(--cobalt); box-shadow: 0 0 0 3px rgba(46,92,255,0.12); }
+
+  .result-box {
+    background: linear-gradient(135deg, #12203A, #1E2E4D);
+    border-radius: 16px; padding: 32px; text-align: center; color: var(--white); margin-bottom: 28px;
+  }
+  .result-box .big-num {
+    font-family: 'Space Grotesk', sans-serif; font-weight: 700; font-size: 3rem;
+    background: linear-gradient(135deg, #6E8CFF, #FF9F80);
+    -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
+  }
+  .result-box .result-text { font-size: 1.05rem; color: rgba(255,255,255,0.85); margin-top: 6px; }
+  .result-box .result-sub { font-size: 0.85rem; color: rgba(255,255,255,0.5); margin-top: 10px; }
+
+  .target-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; }
+  .target-cell {
+    background: var(--paper); border: 1px solid var(--paper-dim); border-radius: 12px;
+    padding: 18px; text-align: center;
+  }
+  .target-cell .tnum { font-family: 'Space Grotesk', sans-serif; font-weight: 700; font-size: 1.4rem; color: var(--ink); }
+  .target-cell .tlbl { font-size: 0.78rem; color: var(--ink-soft); margin-top: 4px; }
+
+  .explainer { padding: 8px 0 96px; }
+  .explainer h2 {
+    font-family: 'Space Grotesk', sans-serif; font-weight: 600; font-size: 1.4rem; margin-bottom: 14px;
+  }
+  .explainer p { color: var(--ink-soft); margin-bottom: 16px; }
+  .formula-box {
+    background: var(--white); border: 1px solid var(--paper-dim); border-radius: 12px;
+    padding: 20px 24px; font-family: 'JetBrains Mono', monospace; font-size: 0.9rem; color: var(--ink);
+    margin: 20px 0; text-align: center;
+  }
+
+  .cta-strip {
+    background: var(--ink); border-radius: 20px; padding: 44px; text-align: center; margin-bottom: 80px;
+  }
+  .cta-strip h3 { font-family: 'Space Grotesk', sans-serif; color: var(--white); font-size: 1.4rem; margin-bottom: 10px; }
+  .cta-strip p { color: rgba(255,255,255,0.6); margin-bottom: 22px; }
+  .cta-btn {
+    display: inline-block; background: var(--white); color: var(--ink);
+    padding: 14px 26px; border-radius: 10px; font-weight: 700; font-size: 0.95rem;
+  }
+  .cta-btn:hover { background: var(--coral); color: var(--white); }
+
+  @media (max-width: 640px) {
+    .input-row, .target-grid { grid-template-columns: 1fr; }
+    .calc-card { padding: 26px; }
+  }
+</style>
+</head>
+<body>
+
+<nav class="nav">
+  <div class="nav-inner">
+    <div class="logo"><a href="/">NGTAPZ<span class="dot">.</span></a></div>
+    <a href="/tools.html" class="back-link">← All tools</a>
+  </div>
+</nav>
+
+<header class="hero wrap">
+  <div class="eyebrow">📈 Free calculator</div>
+  <h1>Google Star Rating Calculator</h1>
+  <p>Enter your current rating and review count to see exactly how many 5-star reviews it takes to reach your target.</p>
+</header>
+
+<div class="wrap">
+  <div class="calc-card">
+
+    <div class="input-row">
+      <div class="field">
+        <label for="currentRating">Current rating</label>
+        <input type="number" id="currentRating" value="4.2" step="0.1" min="1" max="5">
+      </div>
+      <div class="field">
+        <label for="reviewCount">Number of reviews</label>
+        <input type="number" id="reviewCount" value="50" min="0">
+      </div>
+      <div class="field">
+        <label for="targetRating">Target rating</label>
+        <input type="number" id="targetRating" value="4.5" step="0.1" min="1" max="5">
+      </div>
+    </div>
+
+    <div class="result-box">
+      <div class="big-num" id="resultNum">30</div>
+      <div class="result-text" id="resultText">more 5-star reviews to go from <b>4.2</b> to <b>4.5</b> stars.</div>
+      <div class="result-sub" id="resultSub"></div>
+    </div>
+
+    <div class="target-grid" id="targetGrid"></div>
+
+  </div>
+
+  <div class="explainer">
+    <h2>How the math works</h2>
+    <p>Your Google rating is the average of every review's star value. To move that average from where it is to a target, the number of new 5-star reviews needed is:</p>
+    <div class="formula-box">5-star reviews needed = review count × (target − current) ÷ (5 − target)</div>
+    <p>The higher your rating already is, the more each 5-star review costs you — because you're closer to the ceiling of 5. That's why a high rating is only stable when it's backed by a steady stream of recent reviews. A 4.8 built on 500 reviews shrugs off a bad week; a 4.8 built on 25 wobbles every time one customer has an off day.</p>
+  </div>
+
+  <div class="cta-strip">
+    <h3>Make it easy for happy customers to leave a review</h3>
+    <p>An NGTAPZ card sends people straight to your review page with one tap — no searching, no typing.</p>
+    <a href="/#products" class="cta-btn">See the cards →</a>
+  </div>
+</div>
+
+<script>
+  const currentInput = document.getElementById('currentRating');
+  const countInput = document.getElementById('reviewCount');
+  const targetInput = document.getElementById('targetRating');
+  const resultNum = document.getElementById('resultNum');
+  const resultText = document.getElementById('resultText');
+  const resultSub = document.getElementById('resultSub');
+  const targetGrid = document.getElementById('targetGrid');
+
+  function fiveStarsNeeded(current, count, target) {
+    if (target <= current) return 0;
+    if (target >= 5) return Infinity;
+    const needed = count * (target - current) / (5 - target);
+    return Math.max(0, Math.ceil(needed));
+  }
+
+  function calculate() {
+    const current = parseFloat(currentInput.value) || 0;
+    const count = parseInt(countInput.value) || 0;
+    const target = parseFloat(targetInput.value) || 0;
+
+    const needed = fiveStarsNeeded(current, count, target);
+
+    if (target <= current) {
+      resultNum.textContent = '0';
+      resultText.innerHTML = `You're already at or above <b>${target}</b> stars — nothing more needed.`;
+      resultSub.textContent = '';
+    } else if (!isFinite(needed)) {
+      resultNum.textContent = '∞';
+      resultText.textContent = 'A perfect 5.0 target can never be fully reached with a nonzero review count.';
+      resultSub.textContent = '';
+    } else {
+      resultNum.textContent = needed.toLocaleString();
+      resultText.innerHTML = `more 5-star reviews to go from <b>${current}</b> to <b>${target}</b> stars.`;
+      resultSub.textContent = `From ${current} stars over ${count.toLocaleString()} reviews`;
+    }
+
+    // Quick-reference grid: how many needed to hit 4.5, 4.8, 4.9 from current
+    const refTargets = [4.5, 4.8, 4.9];
+    targetGrid.innerHTML = refTargets.map(t => {
+      const n = fiveStarsNeeded(current, count, t);
+      const label = isFinite(n) ? '+' + n.toLocaleString() : '∞';
+      return `<div class="target-cell"><div class="tnum">${label}</div><div class="tlbl">to reach ${t}</div></div>`;
+    }).join('');
+  }
+
+  [currentInput, countInput, targetInput].forEach(el => el.addEventListener('input', calculate));
+  calculate();
+</script>
+</body>
+</html>
