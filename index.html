@@ -343,6 +343,28 @@
   }
   .how-step p { color: var(--ink-soft); font-size: 0.94rem; }
 
+  /* ---------- BUSINESS TYPES GRID ---------- */
+  .biz-type-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 14px;
+  }
+  .biz-type-cell {
+    background: var(--white);
+    border: 1px solid var(--paper-dim);
+    border-radius: 12px;
+    padding: 20px 18px;
+    text-align: center;
+    font-weight: 600;
+    font-size: 0.95rem;
+    color: var(--ink);
+    transition: border-color 0.15s ease, transform 0.15s ease;
+  }
+  .biz-type-cell:hover {
+    border-color: var(--cobalt);
+    transform: translateY(-2px);
+  }
+
   /* ---------- FEATURES STRIP ---------- */
   .features-strip {
     display: grid;
@@ -421,6 +443,7 @@
     .hero-grid { grid-template-columns: 1fr; }
     .tap-stage { max-width: 340px; margin: 0 auto; }
     .products-grid, .how-grid { grid-template-columns: 1fr; }
+    .biz-type-grid { grid-template-columns: repeat(3, 1fr); }
     .features-strip { grid-template-columns: repeat(2, 1fr); }
     .cta-band { flex-direction: column; align-items: flex-start; }
     .nav-links { display: none; }
@@ -432,6 +455,7 @@
     .hero-ctas { flex-direction: column; }
     .hero-ctas a { text-align: center; }
     .features-strip { grid-template-columns: 1fr; }
+    .biz-type-grid { grid-template-columns: repeat(2, 1fr); }
     .cta-band { padding: 40px 28px; }
   }
 
@@ -550,6 +574,31 @@
         <h3>Track it, change it anytime</h3>
         <p>Every scan shows up in your free dashboard. Moved locations or updated your menu? Change the link — the card stays the same.</p>
       </div>
+    </div>
+  </div>
+</section>
+
+<section class="section">
+  <div class="wrap">
+    <div class="section-head" style="margin-left:auto;margin-right:auto;text-align:center;">
+      <div class="section-eyebrow">Who it's for</div>
+      <h2>Built for businesses that run on foot traffic</h2>
+      <p style="margin:0 auto;">If people walk in, sit down, or stop by your counter, an NGTAPZ card gives them one tap to do what you want next.</p>
+    </div>
+
+    <div class="biz-type-grid">
+      <div class="biz-type-cell">Restaurants</div>
+      <div class="biz-type-cell">Cafés & Coffee Shops</div>
+      <div class="biz-type-cell">Salons & Barbershops</div>
+      <div class="biz-type-cell">Bakeries</div>
+      <div class="biz-type-cell">Food Trucks</div>
+      <div class="biz-type-cell">Bars & Lounges</div>
+      <div class="biz-type-cell">Hotels & B&Bs</div>
+      <div class="biz-type-cell">Retail Shops</div>
+      <div class="biz-type-cell">Gyms & Studios</div>
+      <div class="biz-type-cell">Spas</div>
+      <div class="biz-type-cell">Auto Shops</div>
+      <div class="biz-type-cell">Pop-ups & Markets</div>
     </div>
   </div>
 </section>
