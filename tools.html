@@ -1,1 +1,185 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Free Tools for Google Reviews | NGTAPZ</title>
+<meta name="description" content="Free tools for managing your Google Business Profile — reply to reviews, calculate your path to a higher rating, and audit your listing.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --paper: #F3F5F7;
+    --paper-dim: #E7EBEF;
+    --ink: #12203A;
+    --ink-soft: #4B5A72;
+    --cobalt: #2E5CFF;
+    --coral: #FF7A59;
+    --steel: #B8BEC7;
+    --white: #FFFFFF;
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  html { scroll-behavior: smooth; }
+  body {
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+    background: var(--paper);
+    color: var(--ink);
+    line-height: 1.5;
+    -webkit-font-smoothing: antialiased;
+  }
+  .display { font-family: 'Space Grotesk', sans-serif; }
+  .mono { font-family: 'JetBrains Mono', monospace; }
+  a { color: inherit; text-decoration: none; }
 
+  .wrap { max-width: 1180px; margin: 0 auto; padding: 0 32px; }
+
+  .nav {
+    position: sticky; top: 0; z-index: 50;
+    background: rgba(243, 245, 247, 0.85);
+    backdrop-filter: blur(10px);
+    border-bottom: 1px solid var(--paper-dim);
+  }
+  .nav-inner {
+    max-width: 1180px; margin: 0 auto; padding: 20px 32px;
+    display: flex; align-items: center; justify-content: space-between;
+  }
+  .logo { font-family: 'Space Grotesk', sans-serif; font-weight: 700; font-size: 1.3rem; }
+  .logo .dot { color: var(--coral); }
+  .nav-links { display: flex; align-items: center; gap: 28px; font-size: 0.9rem; font-weight: 500; color: var(--ink-soft); }
+  .nav-links a:hover { color: var(--ink); }
+  .nav-cta {
+    background: var(--ink); color: var(--white);
+    padding: 10px 20px; border-radius: 8px; font-weight: 600; font-size: 0.88rem;
+  }
+  .nav-cta:hover { background: var(--cobalt); }
+
+  .hero { padding: 76px 0 56px; }
+  .eyebrow {
+    display: inline-flex; align-items: center; gap: 8px;
+    font-family: 'JetBrains Mono', monospace; font-size: 0.78rem; font-weight: 500;
+    color: var(--cobalt); background: rgba(46, 92, 255, 0.08);
+    border: 1px solid rgba(46, 92, 255, 0.18);
+    padding: 6px 14px; border-radius: 20px; margin-bottom: 24px;
+  }
+  .hero h1 {
+    font-family: 'Space Grotesk', sans-serif; font-weight: 700;
+    font-size: clamp(2.2rem, 4vw, 3rem); line-height: 1.08; letter-spacing: -0.02em;
+    margin-bottom: 16px; max-width: 640px;
+  }
+  .hero p {
+    font-size: 1.1rem; color: var(--ink-soft); max-width: 520px;
+  }
+
+  .tools-grid {
+    display: grid; grid-template-columns: repeat(3, 1fr); gap: 24px;
+    padding: 8px 0 96px;
+  }
+  .tool-card {
+    background: var(--white);
+    border: 1px solid var(--paper-dim);
+    border-radius: 18px;
+    padding: 32px;
+    display: flex; flex-direction: column;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+  }
+  .tool-card:hover { transform: translateY(-4px); box-shadow: 0 20px 40px -16px rgba(18, 32, 58, 0.15); }
+
+  .tool-icon {
+    width: 52px; height: 52px; border-radius: 14px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 1.4rem; margin-bottom: 22px;
+  }
+  .icon-reply { background: linear-gradient(135deg, #2E5CFF, #6E8CFF); }
+  .icon-calc { background: linear-gradient(135deg, #FF7A59, #FF9F80); }
+  .icon-audit { background: linear-gradient(135deg, #12203A, #3B4A66); }
+
+  .tool-card .tag {
+    font-family: 'JetBrains Mono', monospace; font-size: 0.7rem;
+    color: var(--coral); text-transform: uppercase; letter-spacing: 0.05em;
+    margin-bottom: 8px;
+  }
+  .tool-card h3 { font-family: 'Space Grotesk', sans-serif; font-weight: 600; font-size: 1.25rem; margin-bottom: 10px; }
+  .tool-card p { color: var(--ink-soft); font-size: 0.94rem; margin-bottom: 24px; flex: 1; }
+  .tool-link {
+    font-weight: 600; font-size: 0.9rem; color: var(--ink);
+    display: inline-flex; align-items: center; gap: 6px;
+  }
+  .tool-card:hover .tool-link { color: var(--cobalt); }
+
+  footer { border-top: 1px solid var(--paper-dim); padding: 40px 0; }
+  .footer-inner { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 16px; }
+  .footer-note { font-size: 0.8rem; color: var(--steel); }
+
+  @media (max-width: 900px) {
+    .tools-grid { grid-template-columns: 1fr; }
+    .nav-links { display: none; }
+  }
+  @media (max-width: 560px) {
+    .wrap { padding: 0 20px; }
+    .nav-inner { padding: 16px 20px; }
+    .hero { padding: 48px 0 40px; }
+  }
+</style>
+</head>
+<body>
+
+<nav class="nav">
+  <div class="nav-inner">
+    <div class="logo"><a href="/">NGTAPZ<span class="dot">.</span></a></div>
+    <div class="nav-links">
+      <a href="/#products">Cards</a>
+      <a href="/tools.html">Tools</a>
+      <a href="/dashboard.html">Dashboard</a>
+      <a href="/activation.html" class="nav-cta">Activate a card</a>
+    </div>
+  </div>
+</nav>
+
+<header class="hero">
+  <div class="wrap">
+    <div class="eyebrow">Free · No login required</div>
+    <h1>Tools for growing your Google reviews</h1>
+    <p>Three free tools to help you reply faster, understand your rating math, and see exactly what's holding your listing back.</p>
+  </div>
+</header>
+
+<section class="wrap">
+  <div class="tools-grid">
+
+    <a href="/tools/review-reply-generator.html" class="tool-card">
+      <div class="tool-icon icon-reply">💬</div>
+      <div class="tag">Reply faster</div>
+      <h3>Review Reply Generator</h3>
+      <p>Paste a customer's review, pick a tone, get a ready-to-post owner reply in seconds.</p>
+      <span class="tool-link">Open tool →</span>
+    </a>
+
+    <a href="/tools/rating-calculator.html" class="tool-card">
+      <div class="tool-icon icon-calc">📈</div>
+      <div class="tag">Do the math</div>
+      <h3>Star Rating Calculator</h3>
+      <p>See exactly how many 5-star reviews you need to move your rating from where it is to where you want it.</p>
+      <span class="tool-link">Open tool →</span>
+    </a>
+
+    <a href="/tools/business-audit.html" class="tool-card">
+      <div class="tool-icon icon-audit">🔍</div>
+      <div class="tag">Find gaps</div>
+      <h3>Business Profile Audit</h3>
+      <p>Search your business and get an instant score across reviews, hours, photos, and contact info — plus what to fix first.</p>
+      <span class="tool-link">Open tool →</span>
+    </a>
+
+  </div>
+</section>
+
+<footer>
+  <div class="wrap footer-inner">
+    <div class="logo" style="font-size: 1.05rem;"><a href="/">NGTAPZ<span class="dot">.</span></a></div>
+    <div class="footer-note">A product by NGOODIEZ</div>
+  </div>
+</footer>
+
+</body>
+</html>
