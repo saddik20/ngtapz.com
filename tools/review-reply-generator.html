@@ -1,0 +1,276 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Review Reply Generator | NGTAPZ Tools</title>
+<meta name="description" content="Paste a Google review, pick a tone, get a professional owner reply you can post in seconds.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --paper: #F3F5F7; --paper-dim: #E7EBEF;
+    --ink: #12203A; --ink-soft: #4B5A72;
+    --cobalt: #2E5CFF; --coral: #FF7A59; --steel: #B8BEC7; --white: #FFFFFF;
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+    background: var(--paper); color: var(--ink); line-height: 1.5;
+    -webkit-font-smoothing: antialiased;
+  }
+  a { color: inherit; text-decoration: none; }
+  .wrap { max-width: 800px; margin: 0 auto; padding: 0 32px; }
+
+  .nav {
+    position: sticky; top: 0; z-index: 50;
+    background: rgba(243, 245, 247, 0.9); backdrop-filter: blur(10px);
+    border-bottom: 1px solid var(--paper-dim);
+  }
+  .nav-inner { max-width: 1180px; margin: 0 auto; padding: 18px 32px; display: flex; align-items: center; justify-content: space-between; }
+  .logo { font-family: 'Space Grotesk', sans-serif; font-weight: 700; font-size: 1.2rem; }
+  .logo .dot { color: var(--coral); }
+  .back-link { font-size: 0.85rem; color: var(--ink-soft); font-weight: 500; }
+  .back-link:hover { color: var(--ink); }
+
+  .hero { padding: 56px 0 8px; text-align: center; }
+  .eyebrow {
+    display: inline-flex; align-items: center; gap: 8px;
+    font-family: 'JetBrains Mono', monospace; font-size: 0.78rem; font-weight: 500;
+    color: var(--cobalt); background: rgba(46, 92, 255, 0.08);
+    border: 1px solid rgba(46, 92, 255, 0.18); padding: 6px 14px; border-radius: 20px; margin-bottom: 24px;
+  }
+  h1 {
+    font-family: 'Space Grotesk', sans-serif; font-weight: 700;
+    font-size: clamp(2rem, 4vw, 2.6rem); letter-spacing: -0.02em; margin-bottom: 14px;
+  }
+  .hero p { color: var(--ink-soft); font-size: 1.05rem; max-width: 480px; margin: 0 auto; }
+
+  .tool-card {
+    background: var(--white); border-radius: 20px; border: 1px solid var(--paper-dim);
+    padding: 36px; margin: 40px 0 80px; box-shadow: 0 20px 50px -24px rgba(18,32,58,0.15);
+  }
+
+  .field { margin-bottom: 22px; }
+  .field label { display: block; font-weight: 600; font-size: 0.9rem; margin-bottom: 10px; }
+  textarea {
+    width: 100%; min-height: 130px; padding: 16px; border: 1.5px solid var(--paper-dim);
+    border-radius: 12px; font-family: inherit; font-size: 0.98rem; resize: vertical;
+  }
+  textarea:focus, input:focus, select:focus {
+    outline: none; border-color: var(--cobalt); box-shadow: 0 0 0 3px rgba(46,92,255,0.12);
+  }
+  .char-count { text-align: right; font-size: 0.78rem; color: var(--steel); margin-top: 6px; }
+
+  .row-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 16px; }
+
+  .star-picker { display: flex; gap: 8px; }
+  .star-btn {
+    width: 44px; height: 44px; border-radius: 10px; border: 1.5px solid var(--paper-dim);
+    background: var(--white); font-size: 1.2rem; cursor: pointer; display: flex; align-items: center; justify-content: center;
+    transition: all 0.15s ease;
+  }
+  .star-btn.active { background: #FFF7E6; border-color: #F5C518; }
+
+  input[type="text"], select {
+    width: 100%; padding: 12px 14px; border: 1.5px solid var(--paper-dim); border-radius: 10px;
+    font-family: inherit; font-size: 0.95rem; background: var(--white);
+  }
+
+  .generate-btn {
+    width: 100%; padding: 16px; background: var(--ink); color: var(--white); border: none;
+    border-radius: 12px; font-weight: 700; font-size: 1rem; cursor: pointer; margin-top: 6px;
+    transition: background 0.15s ease, transform 0.15s ease;
+  }
+  .generate-btn:hover { background: var(--cobalt); transform: translateY(-1px); }
+  .generate-btn:disabled { opacity: 0.6; cursor: not-allowed; transform: none; }
+
+  .error-msg {
+    background: #FEF2F2; border: 1px solid #FCA5A5; color: #DC2626;
+    border-radius: 10px; padding: 12px 16px; font-size: 0.9rem; margin-top: 16px; display: none;
+  }
+  .error-msg.show { display: block; }
+
+  .reply-output {
+    background: var(--paper); border: 1px solid var(--paper-dim); border-radius: 14px;
+    padding: 22px; margin-top: 24px; display: none;
+  }
+  .reply-output.show { display: block; }
+  .reply-output p { font-size: 0.98rem; color: var(--ink); margin-bottom: 16px; white-space: pre-wrap; }
+  .copy-btn {
+    background: var(--white); border: 1.5px solid var(--paper-dim); color: var(--ink);
+    padding: 10px 18px; border-radius: 8px; font-weight: 600; font-size: 0.85rem; cursor: pointer;
+  }
+  .copy-btn:hover { border-color: var(--ink); }
+  .ai-note { font-size: 0.78rem; color: var(--steel); margin-top: 14px; }
+
+  .cta-strip {
+    background: var(--ink); border-radius: 20px; padding: 44px; text-align: center; margin-bottom: 80px;
+  }
+  .cta-strip h3 { font-family: 'Space Grotesk', sans-serif; color: var(--white); font-size: 1.4rem; margin-bottom: 10px; }
+  .cta-strip p { color: rgba(255,255,255,0.6); margin-bottom: 22px; }
+  .cta-btn {
+    display: inline-block; background: var(--white); color: var(--ink);
+    padding: 14px 26px; border-radius: 10px; font-weight: 700; font-size: 0.95rem;
+  }
+  .cta-btn:hover { background: var(--coral); color: var(--white); }
+
+  @media (max-width: 640px) {
+    .row-3 { grid-template-columns: 1fr; }
+    .tool-card { padding: 24px; }
+  }
+</style>
+</head>
+<body>
+
+<nav class="nav">
+  <div class="nav-inner">
+    <div class="logo"><a href="/">NGTAPZ<span class="dot">.</span></a></div>
+    <a href="/tools.html" class="back-link">← All tools</a>
+  </div>
+</nav>
+
+<header class="hero wrap">
+  <div class="eyebrow">💬 Free tool · No login</div>
+  <h1>Review Reply Generator</h1>
+  <p>Paste a Google review — positive or negative — pick a tone, and get a professional owner reply you can post in seconds.</p>
+</header>
+
+<div class="wrap">
+  <div class="tool-card">
+
+    <div class="field">
+      <label for="reviewText">Paste the review</label>
+      <textarea id="reviewText" maxlength="1500" placeholder="Paste the customer's Google review here..."></textarea>
+      <div class="char-count"><span id="charCount">0</span>/1500</div>
+    </div>
+
+    <div class="field">
+      <label>Star rating</label>
+      <div class="star-picker" id="starPicker">
+        <button type="button" class="star-btn active" data-stars="1">★</button>
+        <button type="button" class="star-btn" data-stars="2">★</button>
+        <button type="button" class="star-btn" data-stars="3">★</button>
+        <button type="button" class="star-btn" data-stars="4">★</button>
+        <button type="button" class="star-btn" data-stars="5">★</button>
+      </div>
+    </div>
+
+    <div class="row-3">
+      <div class="field">
+        <label for="businessType">Business type (optional)</label>
+        <input type="text" id="businessType" placeholder="restaurant">
+      </div>
+      <div class="field">
+        <label for="toneSelect">Tone</label>
+        <select id="toneSelect">
+          <option value="professional">Professional</option>
+          <option value="warm">Warm & personal</option>
+          <option value="brief">Brief</option>
+          <option value="apologetic">Apologetic</option>
+        </select>
+      </div>
+      <div class="field" style="display:flex; align-items:flex-end;">
+        <button type="button" id="generateBtn" class="generate-btn">Generate reply</button>
+      </div>
+    </div>
+
+    <div class="error-msg" id="errorMsg"></div>
+
+    <div class="reply-output" id="replyOutput">
+      <p id="replyText"></p>
+      <button type="button" class="copy-btn" id="copyBtn">Copy reply</button>
+      <div class="ai-note">AI-generated — read it over and edit before you post.</div>
+    </div>
+
+  </div>
+
+  <div class="cta-strip">
+    <h3>Get more reviews to reply to</h3>
+    <p>An NGTAPZ card sends every happy customer straight to your review page — one tap, no searching.</p>
+    <a href="/#products" class="cta-btn">See the cards →</a>
+  </div>
+</div>
+
+<script>
+  const API_URL = 'https://nfc-redirect.ngoodiezllc.workers.dev';
+
+  const reviewText = document.getElementById('reviewText');
+  const charCount = document.getElementById('charCount');
+  const starPicker = document.getElementById('starPicker');
+  const businessType = document.getElementById('businessType');
+  const toneSelect = document.getElementById('toneSelect');
+  const generateBtn = document.getElementById('generateBtn');
+  const errorMsg = document.getElementById('errorMsg');
+  const replyOutput = document.getElementById('replyOutput');
+  const replyText = document.getElementById('replyText');
+  const copyBtn = document.getElementById('copyBtn');
+
+  let selectedStars = 1;
+
+  reviewText.addEventListener('input', () => {
+    charCount.textContent = reviewText.value.length;
+  });
+
+  starPicker.addEventListener('click', (e) => {
+    const btn = e.target.closest('.star-btn');
+    if (!btn) return;
+    selectedStars = parseInt(btn.dataset.stars, 10);
+    document.querySelectorAll('.star-btn').forEach((b, i) => {
+      b.classList.toggle('active', i < selectedStars);
+    });
+  });
+
+  generateBtn.addEventListener('click', async () => {
+    errorMsg.classList.remove('show');
+    replyOutput.classList.remove('show');
+
+    const review = reviewText.value.trim();
+    if (!review) {
+      errorMsg.textContent = 'Paste a review first.';
+      errorMsg.classList.add('show');
+      return;
+    }
+
+    generateBtn.disabled = true;
+    generateBtn.textContent = 'Generating...';
+
+    try {
+      const res = await fetch(API_URL + '/api/tools/generate-reply', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          review: review,
+          stars: selectedStars,
+          businessType: businessType.value.trim() || 'business',
+          tone: toneSelect.value
+        })
+      });
+      const data = await res.json();
+
+      if (!data.success) {
+        throw new Error(data.error || 'Failed to generate a reply.');
+      }
+
+      replyText.textContent = data.reply;
+      replyOutput.classList.add('show');
+
+    } catch (err) {
+      errorMsg.textContent = err.message || 'Something went wrong. Try again.';
+      errorMsg.classList.add('show');
+    } finally {
+      generateBtn.disabled = false;
+      generateBtn.textContent = 'Generate reply';
+    }
+  });
+
+  copyBtn.addEventListener('click', () => {
+    navigator.clipboard.writeText(replyText.textContent).then(() => {
+      copyBtn.textContent = 'Copied ✓';
+      setTimeout(() => { copyBtn.textContent = 'Copy reply'; }, 1800);
+    });
+  });
+</script>
+</body>
+</html>
