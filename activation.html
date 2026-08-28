@@ -392,8 +392,8 @@
 @media (max-width: 1100px) {
   .activation-container {
     grid-template-columns: 1fr;
-    gap: 40px;
-    padding: 40px 32px;
+    gap: 24px;
+    padding: 32px 32px;
     max-width: 640px;
   }
   .hero-section { text-align: center; }
@@ -404,11 +404,14 @@
 }
 
 @media (max-width: 560px) {
-  .activation-container { padding: 28px 20px; }
+  .activation-container { padding: 20px 20px 28px; gap: 20px; }
+  .hero-badge { margin-bottom: 12px; }
+  .hero-title { font-size: 1.6rem; margin-bottom: 10px; }
+  .hero-subtitle { font-size: 0.9rem; margin-bottom: 16px; }
+  .feature-row { display: none; }  /* compact mobile: hide to get the form above the fold */
+  .stats-row { display: none; }    /* compact mobile: hide to get the form above the fold */
   .form-card { padding: 26px 22px; }
   .form-row-2 { grid-template-columns: 1fr; }
-  .hero-title { font-size: 2rem; }
-  .stats-row { flex-wrap: wrap; gap: 20px; }
   .success-buttons { flex-direction: column; }
 }
 </style>
