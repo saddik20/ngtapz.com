@@ -297,6 +297,15 @@
   .swatch-menu { background: linear-gradient(135deg, #FF7A59, #FF9F80); }
   .swatch-social { background: linear-gradient(135deg, #12203A, #3B4A66); }
 
+  .product-photo {
+    width: 100%;
+    height: 220px;
+    object-fit: cover;
+    border-radius: 12px;
+    margin-bottom: 22px;
+    background: var(--paper);
+  }
+
   .product-card h3 {
     font-family: 'Space Grotesk', sans-serif;
     font-weight: 600;
@@ -314,6 +323,46 @@
     color: var(--steel);
     border-top: 1px solid var(--paper-dim);
     padding-top: 14px;
+  }
+
+  /* ---------- GOOGLE REVIEW BENEFITS BAND ---------- */
+  .review-benefits-band {
+    background: var(--ink);
+    border-radius: 24px;
+    padding: 56px;
+  }
+  .review-benefits-copy { max-width: 620px; margin-bottom: 40px; }
+  .review-benefits-copy h2 {
+    font-family: 'Space Grotesk', sans-serif;
+    font-weight: 700;
+    font-size: clamp(1.6rem, 3vw, 2.1rem);
+    letter-spacing: -0.015em;
+    margin: 12px 0 14px;
+  }
+  .review-benefits-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 24px;
+  }
+  .review-benefit-cell .rb-icon {
+    width: 44px; height: 44px;
+    border-radius: 10px;
+    background: rgba(255,255,255,0.08);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 1.2rem;
+    margin-bottom: 16px;
+  }
+  .review-benefit-cell h4 {
+    font-family: 'Space Grotesk', sans-serif;
+    font-weight: 600;
+    font-size: 1rem;
+    color: #fff;
+    margin-bottom: 8px;
+  }
+  .review-benefit-cell p {
+    color: rgba(255,255,255,0.55);
+    font-size: 0.85rem;
+    line-height: 1.5;
   }
 
   /* ---------- HOW IT WORKS ---------- */
@@ -445,6 +494,8 @@
     .products-grid, .how-grid { grid-template-columns: 1fr; }
     .biz-type-grid { grid-template-columns: repeat(3, 1fr); }
     .features-strip { grid-template-columns: repeat(2, 1fr); }
+    .review-benefits-grid { grid-template-columns: repeat(2, 1fr); }
+    .review-benefits-band { padding: 36px; }
     .cta-band { flex-direction: column; align-items: flex-start; }
     .nav-links { display: none; }
   }
@@ -456,6 +507,8 @@
     .hero-ctas a { text-align: center; }
     .features-strip { grid-template-columns: 1fr; }
     .biz-type-grid { grid-template-columns: repeat(2, 1fr); }
+    .review-benefits-grid { grid-template-columns: 1fr; }
+    .review-benefits-band { padding: 28px; }
     .cta-band { padding: 40px 28px; }
   }
 
@@ -474,6 +527,7 @@
       <a href="#products">Cards</a>
       <a href="#how">How it works</a>
       <a href="/tools.html">Tools</a>
+      <a href="/dashboard.html">Login</a>
       <a href="/dashboard.html">Dashboard</a>
       <a href="/activation.html" class="nav-cta">Activate a card</a>
     </div>
@@ -527,24 +581,58 @@
 
     <div class="products-grid">
       <div class="product-card">
-        <div class="product-swatch swatch-review">★ Review</div>
+        <img class="product-photo" src="/assets/review-card.jpg" alt="NGTAPZ Google Review stand card">
         <h3>Google Review Card</h3>
         <p>Stand it by the register or the door. One tap sends customers straight to leaving a review — no searching.</p>
         <div class="product-spec">130 × 90mm stand · NFC + QR</div>
       </div>
 
       <div class="product-card">
-        <div class="product-swatch swatch-menu">🍽 Menu</div>
+        <img class="product-photo" src="/assets/menu-card.jpg" alt="NGTAPZ digital menu card">
         <h3>Digital Menu Card</h3>
         <p>On the table, tap or scan pulls up your live menu. Update prices or items anytime, no reprinting.</p>
         <div class="product-spec">100 × 100mm square · NFC + QR</div>
       </div>
 
       <div class="product-card">
-        <div class="product-swatch swatch-social">📱 Social</div>
+        <img class="product-photo" src="/assets/social-card.jpg" alt="NGTAPZ social media follow card">
         <h3>Social Media Card</h3>
         <p>Hand it over, they tap, they're following. One card, one platform — Instagram, TikTok, Facebook, or Snapchat.</p>
         <div class="product-spec">85.6 × 54mm · NFC only</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="section" style="padding-top:0;">
+  <div class="wrap">
+    <div class="review-benefits-band">
+      <div class="review-benefits-copy">
+        <div class="section-eyebrow" style="color:#6E8CFF;">Google Review Card</div>
+        <h2 style="color:#fff;">Get more customers and revenue from Google</h2>
+        <p style="color:rgba(255,255,255,0.65);">Most happy customers never leave a review — not because they don't want to, it's just one more step. Removing that step is the whole point.</p>
+      </div>
+      <div class="review-benefits-grid">
+        <div class="review-benefit-cell">
+          <div class="rb-icon">⭐</div>
+          <h4>More 5-star reviews</h4>
+          <p>One tap at the moment they're happiest — right after a good meal or visit.</p>
+        </div>
+        <div class="review-benefit-cell">
+          <div class="rb-icon">📈</div>
+          <h4>Higher local ranking</h4>
+          <p>More recent reviews is one of the biggest factors in Google's local search results.</p>
+        </div>
+        <div class="review-benefit-cell">
+          <div class="rb-icon">🛒</div>
+          <h4>More walk-in customers</h4>
+          <p>A stronger rating is what turns a Google search into a customer choosing you.</p>
+        </div>
+        <div class="review-benefit-cell">
+          <div class="rb-icon">📊</div>
+          <h4>See it working</h4>
+          <p>Your free dashboard shows every scan — know exactly how many people you're reaching.</p>
+        </div>
       </div>
     </div>
   </div>
