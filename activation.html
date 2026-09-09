@@ -251,6 +251,76 @@
   background-size: 16px;
 }
 
+/* ---------- ICON SELECT (platform dropdown) ---------- */
+.icon-select { position: relative; }
+
+.icon-select-trigger {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 16px;
+  border: 1.5px solid #e2e8f0;
+  border-radius: 10px;
+  background: #fff;
+  font-family: inherit;
+  font-size: 1.15rem;
+  color: #1e293b;
+  cursor: pointer;
+  text-align: left;
+}
+.icon-select-trigger:focus,
+.icon-select.open .icon-select-trigger {
+  outline: none;
+  border-color: #7c5cff;
+  box-shadow: 0 0 0 3px rgba(124,92,255,0.12);
+}
+
+.icon-select-icon {
+  width: 26px;
+  height: 26px;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.icon-select-icon svg { width: 100%; height: 100%; display: block; }
+
+.icon-select-label { flex: 1; }
+.icon-select-caret { width: 16px; height: 16px; flex-shrink: 0; transition: transform 0.15s ease; }
+.icon-select.open .icon-select-caret { transform: rotate(180deg); }
+
+.icon-select-menu {
+  display: none;
+  position: absolute;
+  z-index: 20;
+  top: calc(100% + 6px);
+  left: 0;
+  right: 0;
+  background: #fff;
+  border: 1.5px solid #e2e8f0;
+  border-radius: 12px;
+  box-shadow: 0 12px 32px rgba(15,23,42,0.15);
+  padding: 6px;
+  max-height: 320px;
+  overflow-y: auto;
+}
+.icon-select.open .icon-select-menu { display: block; }
+
+.icon-select-option {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 10px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 1.05rem;
+  color: #1e293b;
+}
+.icon-select-option:hover { background: #f8f7ff; }
+.icon-select-option.selected { background: #f2effe; font-weight: 600; color: #7c5cff; }
+.icon-select-option .icon-select-icon { width: 24px; height: 24px; }
+
 .form-hint {
   font-size: 0.9rem;
   color: #94a3b8;
@@ -404,13 +474,33 @@
 }
 
 @media (max-width: 560px) {
-  .activation-container { padding: 20px 20px 28px; gap: 20px; }
-  .hero-badge { margin-bottom: 12px; }
-  .hero-title { font-size: 1.6rem; margin-bottom: 10px; }
-  .hero-subtitle { font-size: 0.9rem; margin-bottom: 16px; }
+  /* Shrinking the base font scales every rem-based size below at once,
+     since the desktop layout was built on an 18px root. */
+  .activation-wrapper { font-size: 15px; }
+
+  .activation-container { padding: 16px 16px 24px; gap: 14px; }
+
+  .hero-badge { padding: 6px 12px; font-size: 0.8rem; margin-bottom: 10px; }
+  .hero-title { font-size: 1.35rem; margin-bottom: 6px; }
+  .hero-subtitle { font-size: 0.85rem; margin-bottom: 0; }
   .feature-row { display: none; }  /* compact mobile: hide to get the form above the fold */
   .stats-row { display: none; }    /* compact mobile: hide to get the form above the fold */
-  .form-card { padding: 26px 22px; }
+
+  .form-card { padding: 20px 18px; border-radius: 16px; }
+  .form-header { margin-bottom: 14px; }
+  .form-header h2 { font-size: 1.5rem; }
+  .step-indicator { font-size: 0.8rem; padding: 4px 10px; }
+
+  .field-section-label { margin: 16px 0 10px; font-size: 0.8rem; }
+  .form-group { margin-bottom: 12px; }
+  .form-label { margin-bottom: 5px; font-size: 0.95rem; }
+  .form-input, .form-select { padding: 12px 14px; }
+  .form-hint { margin-top: 4px; font-size: 0.82rem; }
+
+  .mini-note { padding: 12px 14px; margin-bottom: 14px; font-size: 0.9rem; }
+  .submit-btn { padding: 15px 20px; font-size: 1.05rem; }
+  .login-link { margin-top: 14px; font-size: 0.9rem; }
+
   .form-row-2 { grid-template-columns: 1fr; }
   .success-buttons { flex-direction: column; }
 }
@@ -433,7 +523,7 @@
       </div>
 
       <h1 class="hero-title">
-        Activate your<br><span class="gradient-text">NFC card</span>
+        Activate your <span class="gradient-text">card</span>
       </h1>
 
       <p class="hero-subtitle">
@@ -467,7 +557,6 @@
 
       <div class="form-header">
         <h2>Set up your card</h2>
-        <span class="step-indicator" id="stepIndicator">Step 1 of 1</span>
       </div>
 
       <div id="errorMsg" class="error-msg">
@@ -486,27 +575,71 @@
           <p class="form-hint" id="cardIdHint">Printed on the back of your card</p>
         </div>
 
-        <div class="form-row-2">
-          <div class="form-group">
-            <label class="form-label">Card type</label>
-            <select id="cardType" class="form-select">
-              <option value="social">Social Media Card</option>
-              <option value="menu">Menu Card</option>
-              <option value="review">Review Card</option>
-            </select>
+        <div class="form-group">
+          <label class="form-label">Platform</label>
+
+          <div class="icon-select" id="platformIconSelect">
+            <button type="button" class="icon-select-trigger" id="platformTrigger" aria-haspopup="listbox" aria-expanded="false">
+              <span class="icon-select-icon" id="platformTriggerIcon"></span>
+              <span class="icon-select-label" id="platformTriggerLabel">Google Review</span>
+              <svg class="icon-select-caret" viewBox="0 0 24 24" fill="none" stroke="#64748b" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"></polyline></svg>
+            </button>
+
+            <div class="icon-select-menu" id="platformMenu" role="listbox">
+              <div class="icon-select-option selected" data-value="google" role="option">
+                <span class="icon-select-icon">
+                  <svg viewBox="0 0 48 48"><path fill="#FFC107" d="M43.6 20.5H42V20H24v8h11.3C33.7 32.9 29.3 36 24 36c-6.6 0-12-5.4-12-12s5.4-12 12-12c3.1 0 5.9 1.2 8 3.1l5.7-5.7C34.5 6.1 29.5 4 24 4 12.9 4 4 12.9 4 24s8.9 20 20 20 20-8.9 20-20c0-1.3-.1-2.7-.4-3.5z"/><path fill="#FF3D00" d="M6.3 14.7l6.6 4.8C14.6 16 19 13 24 13c3.1 0 5.9 1.2 8 3.1l5.7-5.7C34.5 6.1 29.5 4 24 4 16.3 4 9.6 8.3 6.3 14.7z"/><path fill="#4CAF50" d="M24 44c5.3 0 10.1-2 13.7-5.4l-6.3-5.3C29.4 35 26.8 36 24 36c-5.3 0-9.7-3.1-11.3-7.6l-6.5 5C9.5 39.6 16.2 44 24 44z"/><path fill="#1976D2" d="M43.6 20.5H42V20H24v8h11.3c-.8 2.3-2.3 4.2-4.2 5.6l6.3 5.3C39.9 37 44 31.5 44 24c0-1.3-.1-2.7-.4-3.5z"/></svg>
+                </span>
+                <span>Google Review</span>
+              </div>
+              <div class="icon-select-option" data-value="instagram" role="option">
+                <span class="icon-select-icon">
+                  <svg viewBox="0 0 48 48"><defs><radialGradient id="igGrad" cx="30%" cy="107%" r="150%"><stop offset="0%" stop-color="#fdf497"/><stop offset="15%" stop-color="#fdf497"/><stop offset="45%" stop-color="#fd5949"/><stop offset="60%" stop-color="#d6249f"/><stop offset="90%" stop-color="#285AEB"/></radialGradient></defs><rect x="4" y="4" width="40" height="40" rx="11" fill="url(#igGrad)"/><rect x="14" y="14" width="20" height="20" rx="6" fill="none" stroke="#fff" stroke-width="2.5"/><circle cx="24" cy="24" r="5.5" fill="none" stroke="#fff" stroke-width="2.5"/><circle cx="32" cy="16" r="1.6" fill="#fff"/></svg>
+                </span>
+                <span>Instagram</span>
+              </div>
+              <div class="icon-select-option" data-value="tiktok" role="option">
+                <span class="icon-select-icon">
+                  <svg viewBox="0 0 48 48"><rect x="4" y="4" width="40" height="40" rx="11" fill="#010101"/><path fill="#25F4EE" d="M27.5 12h4.1c.3 2.3 1.7 4.4 4.4 5.1v4.2c-1.8 0-3.5-.6-4.9-1.6v9.3c0 4.8-3.9 8.6-8.6 8.6-1.9 0-3.7-.6-5.1-1.7 2.5.4 5.2-.7 6.6-3 .5-.8.8-1.8.8-2.9V12z"/><path fill="#FE2C55" d="M25.9 12h4.1v20c0 4.8-3.9 8.6-8.6 8.6-4.8 0-8.6-3.9-8.6-8.6 0-4.5 3.5-8.2 7.9-8.6v4.3c-2 .3-3.5 2-3.5 4.1 0 2.3 1.9 4.2 4.2 4.2 2.3 0 4.2-1.9 4.2-4.2V12z"/></svg>
+                </span>
+                <span>TikTok</span>
+              </div>
+              <div class="icon-select-option" data-value="facebook" role="option">
+                <span class="icon-select-icon">
+                  <svg viewBox="0 0 48 48"><circle cx="24" cy="24" r="20" fill="#1877F2"/><path fill="#fff" d="M27 25.5h3.7l.6-4.6H27v-2.6c0-1.3.4-2.3 2.3-2.3h2.2v-4.1c-.4-.1-1.7-.2-3.2-.2-3.2 0-5.4 2-5.4 5.6v2.6h-3.6v4.6h3.6V38h4.1V25.5z"/></svg>
+                </span>
+                <span>Facebook</span>
+              </div>
+              <div class="icon-select-option" data-value="snapchat" role="option">
+                <span class="icon-select-icon">
+                  <svg viewBox="0 0 48 48"><rect x="4" y="4" width="40" height="40" rx="11" fill="#FFFC00"/><path fill="#111" d="M24 11c4.1 0 6.6 3.2 6.6 7 0 1.6-.1 3-.3 4.1.7.4 1.9.6 2.1 1.3.2.6-.5 1.2-1.6 1.7.1.5.5 1.1 1.7 1.4.5.1.5.7.1 1-.6.5-1.6.6-1.9.9-.2.2-.1.7-.4 1.1-.4.6-1.7.4-2.6.7-.7.2-1.1 1.4-3.7 1.4s-3-1.2-3.7-1.4c-.9-.3-2.2-.1-2.6-.7-.3-.4-.2-.9-.4-1.1-.3-.3-1.3-.4-1.9-.9-.4-.3-.4-.9.1-1 1.2-.3 1.6-.9 1.7-1.4-1.1-.5-1.8-1.1-1.6-1.7.2-.7 1.4-.9 2.1-1.3-.2-1.1-.3-2.5-.3-4.1 0-3.9 2.6-7 6.6-7z"/></svg>
+                </span>
+                <span>Snapchat</span>
+              </div>
+              <div class="icon-select-option" data-value="menu" role="option">
+                <span class="icon-select-icon">
+                  <svg viewBox="0 0 48 48"><rect x="4" y="4" width="40" height="40" rx="11" fill="#f1f5f9"/><path stroke="#334155" stroke-width="2.2" stroke-linecap="round" fill="none" d="M15 13v10M13 13v6c0 1.7 1 2.5 2 2.5s2-.8 2-2.5v-6M15 25.5V35M33 13v22M33 13c-3 0-5 2.8-5 6.5S30 26 33 26"/></svg>
+                </span>
+                <span>Digital Menu</span>
+              </div>
+              <div class="icon-select-option" data-value="other" role="option">
+                <span class="icon-select-icon">
+                  <svg viewBox="0 0 48 48"><rect x="4" y="4" width="40" height="40" rx="11" fill="#f1f5f9"/><path stroke="#334155" stroke-width="2.4" stroke-linecap="round" fill="none" d="M20 28l8-8M19 16l2.5-2.5a5 5 0 017.1 7.1L26 23M29 32l-2.5 2.5a5 5 0 01-7.1-7.1L22 25"/></svg>
+                </span>
+                <span>Other Link</span>
+              </div>
+            </div>
           </div>
-          <div class="form-group">
-            <label class="form-label">Platform</label>
-            <select id="platform" class="form-select">
-              <option value="google">⭐ Google Review</option>
-              <option value="instagram">📷 Instagram</option>
-              <option value="tiktok">🎵 TikTok</option>
-              <option value="facebook">👍 Facebook</option>
-              <option value="snapchat">👻 Snapchat</option>
-              <option value="menu">🍽️ Digital Menu</option>
-              <option value="other">🔗 Other Link</option>
-            </select>
-          </div>
+
+          <select id="platform" class="hidden">
+            <option value="google">Google Review</option>
+            <option value="instagram">Instagram</option>
+            <option value="tiktok">TikTok</option>
+            <option value="facebook">Facebook</option>
+            <option value="snapchat">Snapchat</option>
+            <option value="menu">Digital Menu</option>
+            <option value="other">Other Link</option>
+          </select>
         </div>
 
         <div id="googleBusinessSearchGroup" class="form-group hidden">
@@ -524,7 +657,7 @@
         <div class="field-section-label">Your account</div>
 
         <div class="mini-note">
-          Create a free account to manage this card and track its scans. Use the same email across cards to see them all in one dashboard.
+          Create a free account to manage this card's scans. Reuse the same email on other cards to see them all in one dashboard.
         </div>
 
         <div class="form-row-2">
@@ -681,6 +814,57 @@ document.addEventListener('DOMContentLoaded', function() {
   platformSelect.addEventListener('change', ngzTogglePlatformFields);
   ngzTogglePlatformFields(); // run once on load in case "Google Review" is already selected
 
+  // ---- Custom icon dropdown for Platform (native <select> stays as the source of truth) ----
+  var iconSelect = document.getElementById('platformIconSelect');
+  var iconTrigger = document.getElementById('platformTrigger');
+  var iconMenu = document.getElementById('platformMenu');
+  var iconTriggerIcon = document.getElementById('platformTriggerIcon');
+  var iconTriggerLabel = document.getElementById('platformTriggerLabel');
+  var iconOptions = iconMenu.querySelectorAll('.icon-select-option');
+
+  function ngzSelectPlatform(value) {
+    var match = null;
+    iconOptions.forEach(function (opt) {
+      var isMatch = opt.getAttribute('data-value') === value;
+      opt.classList.toggle('selected', isMatch);
+      if (isMatch) match = opt;
+    });
+    if (!match) return;
+    iconTriggerIcon.innerHTML = match.querySelector('.icon-select-icon').innerHTML;
+    iconTriggerLabel.textContent = match.querySelector('span:last-child').textContent;
+    platformSelect.value = value;
+  }
+
+  iconTrigger.addEventListener('click', function () {
+    iconSelect.classList.toggle('open');
+    iconTrigger.setAttribute('aria-expanded', iconSelect.classList.contains('open'));
+  });
+
+  iconOptions.forEach(function (opt) {
+    opt.addEventListener('click', function () {
+      ngzSelectPlatform(opt.getAttribute('data-value'));
+      iconSelect.classList.remove('open');
+      iconTrigger.setAttribute('aria-expanded', 'false');
+      platformSelect.dispatchEvent(new Event('change'));
+    });
+  });
+
+  document.addEventListener('click', function (e) {
+    if (!iconSelect.contains(e.target)) {
+      iconSelect.classList.remove('open');
+      iconTrigger.setAttribute('aria-expanded', 'false');
+    }
+  });
+
+  ngzSelectPlatform(platformSelect.value); // sync trigger to the default option on load
+
+  // Card type is no longer a separate field — derive it from the chosen platform.
+  function ngzCardTypeFromPlatform(platform) {
+    if (platform === 'google') return 'review';
+    if (platform === 'menu') return 'menu';
+    return 'social';
+  }
+
   // ---- Live card code validation setup (must come BEFORE anything calls checkCardCode) ----
   var cardIdInput = document.getElementById('cardId');
   var cardIdHint = document.getElementById('cardIdHint');
@@ -812,8 +996,8 @@ document.addEventListener('DOMContentLoaded', function() {
   document.getElementById('submitBtn').addEventListener('click', function() {
 
     var cardId = document.getElementById('cardId').value.trim().toUpperCase();
-    var cardType = document.getElementById('cardType').value;
     var platform = document.getElementById('platform').value;
+    var cardType = ngzCardTypeFromPlatform(platform);
     var destinationUrl = document.getElementById('destinationUrl').value.trim();
     var email = document.getElementById('email').value.trim().toLowerCase();
     var emailConfirm = document.getElementById('emailConfirm').value.trim().toLowerCase();
@@ -904,7 +1088,6 @@ document.addEventListener('DOMContentLoaded', function() {
         document.getElementById('successPlatform').textContent = platform;
         document.getElementById('successUrl').textContent = destinationUrl;
         document.getElementById('successContainer').className = 'success-container show';
-        document.getElementById('stepIndicator').textContent = 'Done';
 
       } else {
         throw new Error(data.error || 'Activation failed');
