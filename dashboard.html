@@ -5,6 +5,8 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Analytics Dashboard | NGTAPZ</title>
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<!-- Google Places Autocomplete — used only when editing a Google Review card's destination -->
+<script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCVxRJPP30A4Z7FhZ9XockOuuG5YaGC-1c&libraries=places&callback=ngzInitGooglePlacesDashboard" defer></script>
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Poppins:wght@400;500;600;700;800&display=swap');
 
@@ -1025,6 +1027,37 @@
   min-height: 18px;
   margin-bottom: 12px;
 }
+.ngz-modal-current {
+  font-size: 0.85rem;
+  color: #94a3b8;
+  margin-bottom: 10px;
+  word-break: break-all;
+}
+.ngz-business-confirmed {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: #f0fdf4;
+  border: 1px solid #86efac;
+  border-radius: 10px;
+  padding: 12px 14px;
+  font-size: 0.9rem;
+  color: #166534;
+  margin-bottom: 8px;
+}
+.ngz-business-confirmed .biz-icon { font-weight: 700; }
+.ngz-business-confirmed .biz-name { font-weight: 700; }
+.ngz-business-confirmed button {
+  margin-left: auto;
+  background: none;
+  border: none;
+  color: #166534;
+  text-decoration: underline;
+  padding: 0;
+  font-weight: 600;
+  font-size: 0.85rem;
+  cursor: pointer;
+}
 .ngz-modal-actions {
   display: flex;
   gap: 12px;
@@ -1261,8 +1294,22 @@
   <div class="ngz-modal-box">
     <h3>Edit Card</h3>
     <span class="ngz-modal-cardid" id="ngzEditCardId">-</span>
-    <label class="ngz-modal-label">Destination URL</label>
-    <input type="url" id="ngzEditUrlInput" class="ngz-modal-input" placeholder="https://...">
+
+    <!-- Menu / Social Media cards: type the link directly -->
+    <div id="ngzEditUrlGroup">
+      <label class="ngz-modal-label">Destination URL</label>
+      <input type="url" id="ngzEditUrlInput" class="ngz-modal-input" placeholder="https://...">
+    </div>
+
+    <!-- Google Review cards: search for the business instead of pasting a link -->
+    <div id="ngzEditBusinessGroup" style="display:none;">
+      <label class="ngz-modal-label">Find your business</label>
+      <p class="ngz-modal-current" id="ngzEditCurrentLinkNote"></p>
+      <div id="ngzEditBusinessSearchWrap">
+        <input type="text" id="ngzEditBusinessSearch" class="ngz-modal-input" placeholder="Start typing your business name...">
+      </div>
+    </div>
+
     <p class="ngz-modal-error" id="ngzEditError"></p>
     <div class="ngz-modal-actions">
       <button class="ngz-modal-save" id="ngzEditSaveBtn">Save Changes</button>
@@ -1270,6 +1317,57 @@
     </div>
   </div>
 </div>
+
+<script>
+  // ---- Google Places Autocomplete — only used when editing a Google Review card ----
+  var ngzPlacesAutocompleteDashboard = null;
+
+  function ngzInitGooglePlacesDashboard() {
+    var input = document.getElementById('ngzEditBusinessSearch');
+    if (!input) {
+      setTimeout(ngzInitGooglePlacesDashboard, 100);
+      return;
+    }
+    if (typeof google === 'undefined' || !google.maps || !google.maps.places) return;
+
+    ngzPlacesAutocompleteDashboard = new google.maps.places.Autocomplete(input, {
+      types: ['establishment'],
+      fields: ['place_id', 'name', 'formatted_address']
+    });
+
+    ngzPlacesAutocompleteDashboard.addListener('place_changed', function () {
+      var place = ngzPlacesAutocompleteDashboard.getPlace();
+      if (!place || !place.place_id) return;
+
+      var reviewUrl = 'https://search.google.com/local/writereview?placeid=' + place.place_id;
+      document.getElementById('ngzEditUrlInput').value = reviewUrl;
+
+      ngzShowBusinessConfirmedDashboard(place.name, place.formatted_address);
+    });
+  }
+
+  function ngzShowBusinessConfirmedDashboard(name, address) {
+    var wrap = document.getElementById('ngzEditBusinessSearchWrap');
+    var existing = document.getElementById('ngzBusinessConfirmedDashboard');
+    if (existing) existing.remove();
+
+    var box = document.createElement('div');
+    box.id = 'ngzBusinessConfirmedDashboard';
+    box.className = 'ngz-business-confirmed';
+    box.innerHTML =
+      '<span class="biz-icon">✓</span>' +
+      '<span><span class="biz-name"></span></span>' +
+      '<button type="button" id="ngzClearBusinessDashboard">Change</button>';
+    box.querySelector('.biz-name').textContent = name + (address ? ' — ' + address : '');
+    wrap.appendChild(box);
+
+    document.getElementById('ngzClearBusinessDashboard').addEventListener('click', function () {
+      box.remove();
+      document.getElementById('ngzEditBusinessSearch').value = '';
+      document.getElementById('ngzEditUrlInput').value = '';
+    });
+  }
+</script>
 
 <script>
 document.addEventListener('DOMContentLoaded', function() {
@@ -1577,7 +1675,7 @@ document.addEventListener('DOMContentLoaded', function() {
     var groups = {
       social: { name: 'Social Media Cards', icon: '📱', cards: [], scans: 0 },
       menu: { name: 'Menu Cards', icon: '🍽️', cards: [], scans: 0 },
-      review: { name: 'Review Cards', icon: '⭐', cards: [], scans: 0 }
+      review: { name: 'Google Review Cards', icon: '⭐', cards: [], scans: 0 }
     };
     
     cards.forEach(function(card) {
@@ -1628,7 +1726,7 @@ document.addEventListener('DOMContentLoaded', function() {
                   '</div>' +
                 '</div>' +
                 '<div class="card-list-actions">' +
-                  '<button class="card-mini-btn secondary" onclick="event.stopPropagation(); window.ngzOpenEdit(\'' + card.cardId + '\', \'' + safeUrl + '\')">Edit</button>' +
+                  '<button class="card-mini-btn secondary" onclick="event.stopPropagation(); window.ngzOpenEdit(\'' + card.cardId + '\', \'' + safeUrl + '\', \'' + (card.platform || '') + '\')">Edit</button>' +
                   '<button class="card-mini-btn primary" onclick="event.stopPropagation(); window.open(\'' + card.destinationUrl + '\', \'_blank\')">Test</button>' +
                 '</div>' +
               '</div>';
@@ -1649,14 +1747,38 @@ document.addEventListener('DOMContentLoaded', function() {
 
   // ---- Inline edit modal ----
   var ngzEditingCardId = null;
+  var ngzEditingIsGoogleReview = false;
 
-  window.ngzOpenEdit = function (cardId, currentUrl) {
+  window.ngzOpenEdit = function (cardId, currentUrl, platform) {
     ngzEditingCardId = cardId;
+    ngzEditingIsGoogleReview = (platform === 'google');
+
     document.getElementById('ngzEditCardId').textContent = cardId;
     document.getElementById('ngzEditUrlInput').value = currentUrl || '';
     document.getElementById('ngzEditError').textContent = '';
-    document.getElementById('ngzEditOverlay').classList.add('show');
-    document.getElementById('ngzEditUrlInput').focus();
+
+    // Reset any leftover business-search state from a previous edit
+    var searchInputEl = document.getElementById('ngzEditBusinessSearch');
+    searchInputEl.value = '';
+    var existingConfirmed = document.getElementById('ngzBusinessConfirmedDashboard');
+    if (existingConfirmed) existingConfirmed.remove();
+
+    var urlGroup = document.getElementById('ngzEditUrlGroup');
+    var businessGroup = document.getElementById('ngzEditBusinessGroup');
+    var currentNote = document.getElementById('ngzEditCurrentLinkNote');
+
+    if (ngzEditingIsGoogleReview) {
+      urlGroup.style.display = 'none';
+      businessGroup.style.display = 'block';
+      currentNote.textContent = currentUrl ? ('Currently linked to: ' + currentUrl) : '';
+      document.getElementById('ngzEditOverlay').classList.add('show');
+      searchInputEl.focus();
+    } else {
+      urlGroup.style.display = 'block';
+      businessGroup.style.display = 'none';
+      document.getElementById('ngzEditOverlay').classList.add('show');
+      document.getElementById('ngzEditUrlInput').focus();
+    }
   };
 
   function ngzCloseEdit() {
