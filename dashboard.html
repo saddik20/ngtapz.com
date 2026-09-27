@@ -1748,6 +1748,7 @@ document.addEventListener('DOMContentLoaded', function() {
   // ---- Inline edit modal ----
   var ngzEditingCardId = null;
   var ngzEditingIsGoogleReview = false;
+  var ngzSavedScrollY = 0;
 
   window.ngzOpenEdit = function (cardId, currentUrl, platform) {
     ngzEditingCardId = cardId;
@@ -1767,6 +1768,13 @@ document.addEventListener('DOMContentLoaded', function() {
     var businessGroup = document.getElementById('ngzEditBusinessGroup');
     var currentNote = document.getElementById('ngzEditCurrentLinkNote');
 
+    // Google's autocomplete dropdown positions itself assuming normal page
+    // flow, and miscalculates if the background page is scrolled while this
+    // fixed-position modal is open — so pin the page to the top while it's up.
+    ngzSavedScrollY = window.scrollY;
+    window.scrollTo(0, 0);
+    document.body.style.overflow = 'hidden';
+
     if (ngzEditingIsGoogleReview) {
       urlGroup.style.display = 'none';
       businessGroup.style.display = 'block';
@@ -1784,6 +1792,8 @@ document.addEventListener('DOMContentLoaded', function() {
   function ngzCloseEdit() {
     document.getElementById('ngzEditOverlay').classList.remove('show');
     ngzEditingCardId = null;
+    document.body.style.overflow = '';
+    window.scrollTo(0, ngzSavedScrollY);
   }
 
   document.getElementById('ngzEditCancelBtn').addEventListener('click', ngzCloseEdit);
