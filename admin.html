@@ -4,6 +4,8 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>NGOODIEZ - Registered Codes Admin</title>
+<!-- Google Places Autocomplete — used only when editing a Google Review card's destination -->
+<script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCVxRJPP30A4Z7FhZ9XockOuuG5YaGC-1c&libraries=places&callback=ngzInitGooglePlacesAdmin" defer></script>
 <style>
   * { margin:0; padding:0; box-sizing:border-box; }
   body {
@@ -135,6 +137,10 @@
     align-items: center;
     justify-content: center;
   }
+  /* Google's autocomplete suggestion list is appended to <body> at its own
+     default z-index, which isn't reliably above this modal — force it on top
+     so it's both visible and clickable while the edit modal is open. */
+  .pac-container { z-index: 999999 !important; }
   .ngz-modal-overlay.show { display: flex; }
   .ngz-modal-box {
     background: #fff;
@@ -166,6 +172,35 @@
     margin-bottom: 8px;
   }
   .ngz-modal-error { color: #dc2626; font-size: 0.8rem; min-height: 18px; margin-bottom: 10px; }
+  .ngz-modal-current {
+    font-size: 0.8rem;
+    color: #888;
+    margin-bottom: 10px;
+    word-break: break-all;
+  }
+  .ngz-business-confirmed {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    background: #f0fdf4;
+    border: 1px solid #86efac;
+    border-radius: 8px;
+    padding: 10px 12px;
+    font-size: 0.85rem;
+    color: #166534;
+    margin-bottom: 8px;
+  }
+  .ngz-business-confirmed .biz-icon { font-weight: 700; }
+  .ngz-business-confirmed .biz-name { font-weight: 700; }
+  .ngz-business-confirmed button {
+    margin-left: auto;
+    background: none;
+    color: #166534;
+    text-decoration: underline;
+    padding: 0;
+    font-weight: 600;
+    font-size: 0.8rem;
+  }
   .ngz-modal-actions { display: flex; gap: 10px; margin-top: 8px; }
   .ngz-modal-save {
     flex: 1;
@@ -218,7 +253,7 @@
       </div>
       <div class="form-group">
         <label for="workerUrlInput">Worker Base URL</label>
-        <input type="text" id="workerUrlInput" value="https://nfc-redirect.ngoodiezllc.workers.dev">
+        <input type="text" id="workerUrlInput" value="https://go.ngtapz.com">
       </div>
       <button id="loadBtn">Load Codes</button>
     </div>
@@ -280,8 +315,22 @@
   <div class="ngz-modal-box">
     <h3>Change Destination Link</h3>
     <span class="ngz-modal-code" id="ngzEditCardId">-</span>
-    <label class="ngz-modal-label">New destination URL</label>
-    <input type="url" id="ngzEditUrlInput" class="ngz-modal-input" placeholder="https://...">
+
+    <!-- Menu / Social Media cards: type the link directly -->
+    <div id="ngzEditUrlGroup">
+      <label class="ngz-modal-label">New destination URL</label>
+      <input type="url" id="ngzEditUrlInput" class="ngz-modal-input" placeholder="https://...">
+    </div>
+
+    <!-- Google Review cards: search for the business instead of pasting a link -->
+    <div id="ngzEditBusinessGroup" style="display:none;">
+      <label class="ngz-modal-label">Find the business</label>
+      <p class="ngz-modal-current" id="ngzEditCurrentLinkNote"></p>
+      <div id="ngzEditBusinessSearchWrap">
+        <input type="text" id="ngzEditBusinessSearch" class="ngz-modal-input" placeholder="Start typing the business name...">
+      </div>
+    </div>
+
     <p class="ngz-modal-error" id="ngzEditError"></p>
     <div class="ngz-modal-actions">
       <button class="ngz-modal-save" id="ngzEditSaveBtn">Save Change</button>
@@ -289,6 +338,68 @@
     </div>
   </div>
 </div>
+
+<script>
+  // ---- Google Places Autocomplete — only used when editing a Google Review card ----
+  var ngzPlacesAutocompleteAdmin = null;
+
+  // A plain CSS rule can lose a race against Google's own injected styles for
+  // .pac-container, so watch for it directly and force its stacking order via
+  // inline styles (which beat stylesheet rules regardless of load order).
+  var ngzPacObserverAdmin = new MutationObserver(function () {
+    var pac = document.querySelector('.pac-container');
+    if (pac) {
+      pac.style.setProperty('z-index', '2147483647', 'important');
+    }
+  });
+  ngzPacObserverAdmin.observe(document.documentElement, { childList: true, subtree: true });
+
+  function ngzInitGooglePlacesAdmin() {
+    var input = document.getElementById('ngzEditBusinessSearch');
+    if (!input) {
+      setTimeout(ngzInitGooglePlacesAdmin, 100);
+      return;
+    }
+    if (typeof google === 'undefined' || !google.maps || !google.maps.places) return;
+
+    ngzPlacesAutocompleteAdmin = new google.maps.places.Autocomplete(input, {
+      types: ['establishment'],
+      fields: ['place_id', 'name', 'formatted_address']
+    });
+
+    ngzPlacesAutocompleteAdmin.addListener('place_changed', function () {
+      var place = ngzPlacesAutocompleteAdmin.getPlace();
+      if (!place || !place.place_id) return;
+
+      var reviewUrl = 'https://search.google.com/local/writereview?placeid=' + place.place_id;
+      document.getElementById('ngzEditUrlInput').value = reviewUrl;
+
+      ngzShowBusinessConfirmedAdmin(place.name, place.formatted_address);
+    });
+  }
+
+  function ngzShowBusinessConfirmedAdmin(name, address) {
+    var wrap = document.getElementById('ngzEditBusinessSearchWrap');
+    var existing = document.getElementById('ngzBusinessConfirmedAdmin');
+    if (existing) existing.remove();
+
+    var box = document.createElement('div');
+    box.id = 'ngzBusinessConfirmedAdmin';
+    box.className = 'ngz-business-confirmed';
+    box.innerHTML =
+      '<span class="biz-icon">✓</span>' +
+      '<span><span class="biz-name"></span></span>' +
+      '<button type="button" id="ngzClearBusinessAdmin">Change</button>';
+    box.querySelector('.biz-name').textContent = name + (address ? ' — ' + address : '');
+    wrap.appendChild(box);
+
+    document.getElementById('ngzClearBusinessAdmin').addEventListener('click', function () {
+      box.remove();
+      document.getElementById('ngzEditBusinessSearch').value = '';
+      document.getElementById('ngzEditUrlInput').value = '';
+    });
+  }
+</script>
 
 <script>
   let allCards = [];
@@ -355,6 +466,11 @@
     }
   }
 
+  function cardTypeLabel(type) {
+    var labels = { menu: 'Menu Card', social: 'Social Media Card', review: 'Google Review Card' };
+    return labels[type] || (type || '—');
+  }
+
   function populateTypeFilter() {
     const types = new Set();
     allCards.forEach(c => { if (c.cardType) types.add(c.cardType); });
@@ -363,7 +479,7 @@
     types.forEach(t => {
       const opt = document.createElement('option');
       opt.value = t;
-      opt.textContent = t;
+      opt.textContent = cardTypeLabel(t);
       typeFilter.appendChild(opt);
     });
     typeFilter.value = [...types].includes(current) ? current : 'all';
@@ -414,13 +530,13 @@
     tbody.innerHTML = filtered.map(c => `
       <tr>
         <td class="code-cell">${escapeHtml(c.cardId)}</td>
-        <td>${escapeHtml(c.cardType || '-')}</td>
+        <td>${escapeHtml(cardTypeLabel(c.cardType))}</td>
         <td><span class="badge ${c.activated ? 'activated' : 'unclaimed'}">${c.activated ? 'Activated' : 'Unclaimed'}</span></td>
         <td class="url-cell" title="${escapeHtml(c.destinationUrl || '')}">${escapeHtml(c.destinationUrl || '—')}</td>
         <td class="email-cell">${escapeHtml(c.userEmail || '—')}</td>
         <td>${c.scans || 0}</td>
         <td>${c.lastUpdated ? new Date(c.lastUpdated).toLocaleDateString() : '—'}</td>
-        <td><button class="edit-btn" onclick="ngzOpenEdit('${escapeHtml(c.cardId)}', '${escapeHtml((c.destinationUrl || '').replace(/'/g, "\\'"))}')">Edit</button></td>
+        <td><button class="edit-btn" onclick="ngzOpenEdit('${escapeHtml(c.cardId)}', '${escapeHtml((c.destinationUrl || '').replace(/'/g, "\\'"))}', '${escapeHtml(c.cardType || '')}')">Edit</button></td>
       </tr>
     `).join('');
   }
@@ -451,19 +567,53 @@
 
   // ---- Edit destination modal ----
   let ngzEditingCardId = null;
+  let ngzEditingIsGoogleReview = false;
+  let ngzSavedScrollY = 0;
 
-  window.ngzOpenEdit = function (cardId, currentUrl) {
+  window.ngzOpenEdit = function (cardId, currentUrl, cardType) {
     ngzEditingCardId = cardId;
+    ngzEditingIsGoogleReview = (cardType === 'review');
+
     document.getElementById('ngzEditCardId').textContent = cardId;
     document.getElementById('ngzEditUrlInput').value = currentUrl || '';
     document.getElementById('ngzEditError').textContent = '';
+
+    // Reset any leftover business-search state from a previous edit
+    const searchInputEl = document.getElementById('ngzEditBusinessSearch');
+    searchInputEl.value = '';
+    const existingConfirmed = document.getElementById('ngzBusinessConfirmedAdmin');
+    if (existingConfirmed) existingConfirmed.remove();
+
+    const urlGroup = document.getElementById('ngzEditUrlGroup');
+    const businessGroup = document.getElementById('ngzEditBusinessGroup');
+    const currentNote = document.getElementById('ngzEditCurrentLinkNote');
+
+    // Google's autocomplete dropdown positions itself assuming normal page
+    // flow, and miscalculates if the background page is scrolled while this
+    // fixed-position modal is open — so pin the page to the top while it's up.
+    ngzSavedScrollY = window.scrollY;
+    window.scrollTo(0, 0);
+    document.body.style.overflow = 'hidden';
+
+    if (ngzEditingIsGoogleReview) {
+      urlGroup.style.display = 'none';
+      businessGroup.style.display = 'block';
+      currentNote.textContent = currentUrl ? ('Currently linked to: ' + currentUrl) : '';
+      searchInputEl.focus();
+    } else {
+      urlGroup.style.display = 'block';
+      businessGroup.style.display = 'none';
+      document.getElementById('ngzEditUrlInput').focus();
+    }
+
     document.getElementById('ngzEditOverlay').classList.add('show');
-    document.getElementById('ngzEditUrlInput').focus();
   };
 
   function ngzCloseEdit() {
     document.getElementById('ngzEditOverlay').classList.remove('show');
     ngzEditingCardId = null;
+    document.body.style.overflow = '';
+    window.scrollTo(0, ngzSavedScrollY);
   }
 
   document.getElementById('ngzEditCancelBtn').addEventListener('click', ngzCloseEdit);
